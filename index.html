@@ -179,25 +179,27 @@
 
       @page {
         size: A4 landscape;
-        /* margin が印刷余白を担う → page-wrapper はパディング不要 */
-        margin: 8mm 10mm;
-        /* 使用可能領域: (297-20)mm × (210-16)mm = 277mm × 194mm */
+        margin: 0;
       }
 
-      /* Each page-wrapper = one A4 landscape page, 2 cards side by side */
+      /*
+       * iOS Safari は @page margin を無視しがち。
+       * padding をページラッパー側に持たせ、
+       * width/height は 100vw/100vh でブラウザが決めるページサイズに追従させる。
+       */
       .page-wrapper {
         display: flex;
         flex-direction: row;
         flex-wrap: nowrap;
-        align-items: stretch;   /* カードを高さいっぱいに伸ばす */
-        width: 277mm;           /* @page content 幅に合わせる */
-        height: 194mm;          /* @page content 高さに合わせる */
-        padding: 0;
+        align-items: stretch;
+        width: 100vw;
+        height: 100vh;
+        padding: 8mm 10mm;
         gap: 5mm;
         border-radius: 0;
         box-shadow: none;
         margin: 0;
-        overflow: hidden;       /* はみ出しを確実にカット */
+        overflow: hidden;
         page-break-after: always;
         break-after: page;
       }
@@ -206,26 +208,25 @@
         break-after: avoid;
       }
 
-      /* 2枚均等配置: (277mm - 5mm gap) / 2 = 136mm */
+      /* 2枚均等幅 */
       .bingo-card {
-        flex: 0 0 136mm;
-        width: 136mm;
+        flex: 1;
+        min-width: 0;
         display: flex;
         flex-direction: column;
         overflow: hidden;
       }
 
-      /* ヘッダーは固定高さ */
       .bingo-header {
         flex-shrink: 0;
       }
 
       .bingo-header-cell {
-        font-size: 22pt;
-        padding: 3mm 0;
+        font-size: 20pt;
+        padding: 2.5mm 0;
       }
 
-      /* グリッドが残り高さを埋める */
+      /* グリッドが残り高さをすべて使う */
       .bingo-grid {
         flex: 1;
         min-height: 0;
@@ -234,12 +235,12 @@
 
       .bingo-cell {
         aspect-ratio: unset;
-        height: auto;           /* grid rows が高さを決める */
-        font-size: 26pt;
+        height: auto;
+        font-size: 24pt;
       }
 
       .bingo-cell.free-cell {
-        font-size: 15pt;
+        font-size: 13pt;
       }
 
       .bingo-card-label {
