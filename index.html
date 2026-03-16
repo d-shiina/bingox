@@ -5,157 +5,293 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ビンゴカード生成</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwindcss.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+        }
+      }
+    }
+  </script>
   <style>
-    * { box-sizing: border-box; }
-    body { font-family: 'Roboto', sans-serif; background: #F1F5F9; }
-    h1, button { font-family: 'Google Sans', 'Roboto', sans-serif; }
-
-    /* MD3 field */
-    .m3-field { position: relative; }
-    .m3-field input, .m3-field select {
-      width: 100%; background: #F1F5F9; border: none;
-      border-bottom: 1px solid #94A3B8; border-radius: 4px 4px 0 0;
-      padding: 22px 16px 6px; font-size: 16px;
-      font-family: 'Roboto', sans-serif; font-weight: 500;
-      color: #1D1B20; outline: none;
-      transition: border-color .2s, background .2s; appearance: none;
-    }
-    .m3-field input:focus, .m3-field select:focus {
-      background: #E2E8F0; border-bottom: 2px solid #334155;
-    }
-    .m3-field label {
-      position: absolute; top: 7px; left: 16px;
-      font-size: 11px; font-weight: 500; letter-spacing: .5px;
-      color: #334155; pointer-events: none; text-transform: uppercase;
+    *, *::before, *::after { box-sizing: border-box; margin: 0; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #f8fafc;
+      min-height: 100dvh;
     }
 
-    /* Button */
-    .btn {
-      border: none; cursor: pointer; border-radius: 8px;
-      padding: 0 28px; height: 44px;
-      font-family: 'Google Sans', sans-serif;
-      font-size: 14px; font-weight: 500; letter-spacing: .25px;
-      transition: filter .15s; touch-action: manipulation;
+    /* ── Animated gradient background ── */
+    .hero-bg {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+      position: relative;
+      overflow: hidden;
     }
-    .btn:hover:not(:disabled) { filter: brightness(.93); }
-    .btn:active:not(:disabled) { filter: brightness(.86); }
-    .btn:disabled { opacity: .65; cursor: default; }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .hero-bg::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 600px 300px at 80% 40%, rgba(99,102,241,.15), transparent),
+                  radial-gradient(ellipse 400px 200px at 20% 80%, rgba(14,165,233,.1), transparent);
+      pointer-events: none;
+    }
 
-    /* Bingo card */
+    /* ── Modern input fields ── */
+    .field-group { position: relative; }
+    .field-group label {
+      display: block;
+      font-size: 11px; font-weight: 600; letter-spacing: .05em;
+      color: #64748b; text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .field-group input,
+    .field-group select {
+      width: 100%;
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 15px; font-weight: 600;
+      font-family: inherit;
+      color: #0f172a;
+      outline: none;
+      transition: all .2s cubic-bezier(.4,0,.2,1);
+      appearance: none;
+      -webkit-appearance: none;
+    }
+    .field-group input:focus,
+    .field-group select:focus {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99,102,241,.12);
+      background: #fff;
+    }
+    .field-group input:hover,
+    .field-group select:hover {
+      border-color: #cbd5e1;
+    }
+    .field-group select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px;
+    }
+
+    /* ── Buttons ── */
+    .btn-primary {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      border: none; cursor: pointer;
+      border-radius: 12px;
+      padding: 0 24px; height: 46px;
+      font-family: inherit;
+      font-size: 14px; font-weight: 600; letter-spacing: .01em;
+      color: #fff;
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      box-shadow: 0 1px 2px rgba(99,102,241,.3), 0 4px 12px rgba(99,102,241,.2);
+      transition: all .2s cubic-bezier(.4,0,.2,1);
+      touch-action: manipulation;
+    }
+    .btn-primary:hover:not(:disabled) {
+      box-shadow: 0 2px 4px rgba(99,102,241,.3), 0 8px 20px rgba(99,102,241,.25);
+      transform: translateY(-1px);
+    }
+    .btn-primary:active:not(:disabled) {
+      transform: translateY(0);
+      box-shadow: 0 1px 2px rgba(99,102,241,.3);
+    }
+    .btn-primary:disabled { opacity: .6; cursor: default; }
+
+    .btn-dark {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      border: none; cursor: pointer;
+      border-radius: 12px;
+      padding: 0 24px; height: 46px;
+      font-family: inherit;
+      font-size: 14px; font-weight: 600; letter-spacing: .01em;
+      color: #fff;
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      box-shadow: 0 1px 3px rgba(0,0,0,.2), 0 4px 12px rgba(0,0,0,.1);
+      transition: all .2s cubic-bezier(.4,0,.2,1);
+      touch-action: manipulation;
+    }
+    .btn-dark:hover:not(:disabled) {
+      box-shadow: 0 2px 4px rgba(0,0,0,.2), 0 8px 20px rgba(0,0,0,.15);
+      transform: translateY(-1px);
+    }
+    .btn-dark:active:not(:disabled) {
+      transform: translateY(0);
+    }
+    .btn-dark:disabled { opacity: .6; cursor: default; }
+
+    /* ── Card panel ── */
+    .card-panel {
+      background: #fff;
+      border-radius: 16px;
+      border: 1px solid #f1f5f9;
+      box-shadow: 0 1px 3px rgba(0,0,0,.04), 0 6px 24px rgba(0,0,0,.04);
+      transition: box-shadow .2s;
+    }
+
+    /* ── Nav buttons ── */
+    .nav-btn {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      border: 1.5px solid #e2e8f0;
+      background: #fff;
+      color: #334155;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      font-size: 18px; font-weight: 700;
+      transition: all .15s;
+      font-family: inherit;
+    }
+    .nav-btn:hover:not(:disabled) {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+    .nav-btn:disabled {
+      opacity: .3; cursor: default;
+    }
+
+    /* ── Bingo card ── */
     .bingo-card {
-      width: clamp(240px, 78%, 400px);
-      border-radius: 4px; overflow: hidden;
-      box-shadow: 0 2px 8px rgba(30,41,59,.18);
+      width: clamp(220px, 80%, 380px);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0,0,0,.08), 0 1px 3px rgba(0,0,0,.06);
+      transition: transform .3s cubic-bezier(.4,0,.2,1);
     }
     .bingo-header {
       display: grid; grid-template-columns: repeat(5, 1fr);
-      background: #1E293B;
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
     }
     .bingo-header-cell {
-      color: white; font-size: clamp(18px, 3.5vw, 40px);
-      font-weight: 700; text-align: center; padding: 4% 0;
-      border-right: 1px solid rgba(255,255,255,.1);
-      font-family: 'Google Sans', sans-serif;
+      color: white;
+      font-size: clamp(16px, 3.2vw, 36px);
+      font-weight: 800;
+      text-align: center;
+      padding: 5% 0;
+      letter-spacing: .02em;
     }
-    .bingo-header-cell:last-child { border-right: none; }
-    .bingo-grid { display: grid; grid-template-columns: repeat(5, 1fr); }
+    .bingo-header-cell:not(:last-child) {
+      border-right: 1px solid rgba(255,255,255,.15);
+    }
+    .bingo-grid {
+      display: grid; grid-template-columns: repeat(5, 1fr);
+      background: #e2e8f0;
+      gap: 1px;
+    }
     .bingo-cell {
-      aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
-      font-size: clamp(20px, 4vw, 52px); font-weight: 700;
-      border: 1px solid #CBD5E1; color: #0F172A; background: white;
-      font-family: 'Google Sans', sans-serif;
+      aspect-ratio: 1;
+      display: flex; align-items: center; justify-content: center;
+      font-size: clamp(18px, 3.8vw, 48px);
+      font-weight: 700;
+      color: #1e293b;
+      background: #fff;
+      font-family: inherit;
+      transition: background .15s;
     }
     .bingo-cell.free-cell {
-      background: #FFF3E0; font-size: clamp(11px, 2vw, 24px);
-      font-weight: 500; color: #BF360C;
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      font-size: clamp(10px, 1.8vw, 20px);
+      font-weight: 700;
+      color: #92400e;
+      letter-spacing: .1em;
     }
 
-    /* Card viewer */
+    /* ── Card viewer ── */
     .card-view {
       display: flex; justify-content: center; align-items: center;
-      padding: 16px 0;
+      padding: 20px 0;
+    }
+
+    /* ── Slide counter pill ── */
+    .slide-pill {
+      display: inline-flex; align-items: center;
+      background: #f1f5f9;
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 13px; font-weight: 600;
+      color: #64748b;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ── Animations ── */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in { animation: fadeIn .4s cubic-bezier(.4,0,.2,1) both; }
+
+    /* ── Responsive tweaks ── */
+    @media (max-width: 1023px) {
+      .mobile-order-settings { order: 2; }
+      .mobile-order-preview  { order: 1; }
     }
   </style>
 </head>
 
-<body class="min-h-screen">
+<body>
 
-  <header style="background:#1E293B; border-bottom:1px solid rgba(255,255,255,.06);">
-    <div class="max-w-5xl mx-auto px-6 py-4 flex items-end justify-between">
+  <!-- ━━ Header ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+  <header class="hero-bg">
+    <div class="max-w-6xl mx-auto px-5 sm:px-8 py-5 sm:py-6 flex items-end justify-between relative z-10">
       <div>
-        <p class="text-xs font-medium tracking-widest" style="color:#64748B;">BINGO CARD GENERATOR</p>
-        <h1 class="text-white text-2xl font-medium tracking-wide" style="line-height:1.2;">ビンゴカード生成</h1>
+        <div class="flex items-center gap-2 mb-1">
+          <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <line x1="3" y1="9" x2="21" y2="9"/>
+              <line x1="9" y1="3" x2="9" y2="21"/>
+              <line x1="15" y1="3" x2="15" y2="21"/>
+              <line x1="3" y1="15" x2="21" y2="15"/>
+            </svg>
+          </div>
+          <p class="text-[11px] font-semibold tracking-[.12em] text-indigo-300/80 uppercase">Bingo Card Generator</p>
+        </div>
+        <h1 class="text-white text-xl sm:text-2xl font-bold tracking-tight">ビンゴカード生成</h1>
       </div>
-      <p class="text-xs pb-0.5 hidden sm:block" style="color:#475569;">A4横 / 2枚組 PDF出力</p>
+      <p class="text-[11px] font-medium pb-0.5 hidden sm:block text-slate-400">A4横 / 2枚組 PDF出力</p>
     </div>
   </header>
 
-  <main class="max-w-5xl mx-auto px-6 py-8">
-    <div class="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-6 items-start">
+  <!-- ━━ Main ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+  <main class="max-w-6xl mx-auto px-5 sm:px-8 py-6 sm:py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 items-start">
 
-      <!-- Settings -->
-      <div class="lg:sticky lg:top-6">
-        <div class="bg-white rounded-2xl p-6" style="box-shadow:0 1px 3px rgba(0,0,0,.07),0 4px 12px rgba(0,0,0,.05);">
-          <p class="text-xs font-medium tracking-widest mb-5" style="color:#94A3B8;">SETTINGS</p>
-          <div class="grid grid-cols-2 gap-4 mb-5">
-            <div class="m3-field">
-              <label>最小値</label>
-              <input type="number" id="numMin" value="1" min="1" max="999">
-            </div>
-            <div class="m3-field">
-              <label>最大値</label>
-              <input type="number" id="numMax" value="75" min="1" max="999">
-            </div>
-            <div class="m3-field">
-              <label>生成枚数</label>
-              <input type="number" id="numCards" value="2" min="1" max="100">
-            </div>
-            <div class="m3-field">
-              <label>中央マス</label>
-              <select id="centerType">
-                <option value="number" selected>数字</option>
-                <option value="free">FREE</option>
-              </select>
-            </div>
-          </div>
-          <button onclick="generateCards()" class="btn text-white w-full"
-            style="background:#334155; box-shadow:0 1px 2px rgba(0,0,0,.25),0 2px 6px rgba(0,0,0,.12);">
-            生成
-          </button>
-        </div>
-      </div>
-
-      <!-- Preview -->
-      <div id="previewCol">
+      <!-- ── Preview (left / top on mobile) ── -->
+      <div id="previewCol" class="mobile-order-preview">
 
         <!-- Empty state -->
-        <div id="emptyState" class="bg-white rounded-2xl flex flex-col items-center justify-center py-20"
-          style="box-shadow:0 1px 3px rgba(0,0,0,.07),0 4px 12px rgba(0,0,0,.05); color:#CBD5E1;">
-          <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round">
-            <rect x="3" y="3" width="18" height="18" rx="2"/>
-            <line x1="3" y1="9" x2="21" y2="9"/>
-            <line x1="9" y1="9" x2="9" y2="21"/>
-            <line x1="15" y1="9" x2="15" y2="21"/>
-            <line x1="3" y1="15" x2="21" y2="15"/>
-          </svg>
-          <p class="mt-4 text-sm font-medium" style="color:#94A3B8;">設定して生成ボタンを押してください</p>
+        <div id="emptyState" class="card-panel flex flex-col items-center justify-center py-20 sm:py-24">
+          <div class="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center mb-4">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <line x1="3" y1="9" x2="21" y2="9"/>
+              <line x1="9" y1="9" x2="9" y2="21"/>
+              <line x1="15" y1="9" x2="15" y2="21"/>
+              <line x1="3" y1="15" x2="21" y2="15"/>
+            </svg>
+          </div>
+          <p class="text-sm font-medium text-slate-400">設定して「生成」ボタンを押してください</p>
         </div>
 
         <!-- Slider section -->
-        <div id="sliderSection" style="display:none;" class="flex flex-col gap-4">
-          <div class="bg-white rounded-2xl p-4" style="box-shadow:0 1px 3px rgba(0,0,0,.07),0 4px 12px rgba(0,0,0,.05);">
+        <div id="sliderSection" style="display:none;" class="flex flex-col gap-4 fade-in">
+          <div class="card-panel p-4 sm:p-5">
             <!-- Nav -->
-            <div class="flex items-center justify-between mb-3 px-1">
+            <div class="flex items-center justify-between mb-2 px-1">
               <button id="prevBtn" onclick="slideTo(currentSlide - 1)"
-                class="w-10 h-10 rounded-lg flex items-center justify-center text-white text-xl font-bold disabled:opacity-30"
-                style="background:#334155; touch-action:manipulation;" disabled>‹</button>
-              <span id="slideCounter" class="text-sm font-medium" style="color:#475569;">1 / 1</span>
+                class="nav-btn" disabled>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+              </button>
+              <span id="slideCounter" class="slide-pill">1 / 1</span>
               <button id="nextBtn" onclick="slideTo(currentSlide + 1)"
-                class="w-10 h-10 rounded-lg flex items-center justify-center text-white text-xl font-bold disabled:opacity-30"
-                style="background:#334155; touch-action:manipulation;" disabled>›</button>
+                class="nav-btn" disabled>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+              </button>
             </div>
             <!-- Card display -->
             <div id="cardDisplay"
@@ -163,16 +299,68 @@
             </div>
           </div>
 
-          <button id="printBtn" onclick="printCards()" class="btn text-white w-full"
-            style="background:#0F172A; box-shadow:0 1px 2px rgba(0,0,0,.3),0 2px 6px rgba(0,0,0,.15);">
+          <button id="printBtn" onclick="printCards()" class="btn-dark w-full">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
             PDF 出力
           </button>
         </div>
 
       </div>
+
+      <!-- ── Settings (right sidebar / bottom on mobile) ── -->
+      <div class="lg:sticky lg:top-6 mobile-order-settings">
+        <div class="card-panel p-5 sm:p-6">
+          <div class="flex items-center gap-2 mb-5">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+            <p class="text-xs font-semibold tracking-[.08em] text-slate-400 uppercase">Settings</p>
+          </div>
+
+          <div class="space-y-4 mb-6">
+            <div class="grid grid-cols-2 gap-3">
+              <div class="field-group">
+                <label for="numMin">最小値</label>
+                <input type="number" id="numMin" value="1" min="1" max="999">
+              </div>
+              <div class="field-group">
+                <label for="numMax">最大値</label>
+                <input type="number" id="numMax" value="75" min="1" max="999">
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div class="field-group">
+                <label for="numCards">生成枚数</label>
+                <input type="number" id="numCards" value="2" min="1" max="100">
+              </div>
+              <div class="field-group">
+                <label for="centerType">中央マス</label>
+                <select id="centerType">
+                  <option value="number" selected>数字</option>
+                  <option value="free">FREE</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <button onclick="generateCards()" class="btn-primary w-full">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+            </svg>
+            生成
+          </button>
+        </div>
+      </div>
+
     </div>
   </main>
 
+  <!-- ━━ Scripts ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     let generatedCards = [];
@@ -282,11 +470,11 @@
       const HEADER_H = h - cellH * 5;
 
       ctx.fillStyle = 'white'; ctx.fillRect(x, y, w, h);
-      ctx.fillStyle = '#1E293B'; ctx.fillRect(x, y, w, HEADER_H);
+      ctx.fillStyle = '#6366f1'; ctx.fillRect(x, y, w, HEADER_H);
 
       const headers = ['B','I','N','G','O'];
       ctx.fillStyle = 'white'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.font = `700 ${Math.round(HEADER_H * 0.72)}px Arial, sans-serif`;
+      ctx.font = `800 ${Math.round(HEADER_H * 0.72)}px Arial, sans-serif`;
       for (let i = 0; i < 5; i++) {
         ctx.fillText(headers[i], x + cellW * i + cellW / 2, y + HEADER_H / 2);
       }
@@ -296,14 +484,14 @@
           const cx = x + cellW * col, cy = y + HEADER_H + cellH * row;
           const val = cells[row * 5 + col];
           if (val === null) {
-            ctx.fillStyle = '#FFF3E0'; ctx.fillRect(cx, cy, cellW, cellH);
-            ctx.fillStyle = '#BF360C';
-            ctx.font = `500 ${Math.round(cellH * 0.38)}px Arial, sans-serif`;
+            ctx.fillStyle = '#fef3c7'; ctx.fillRect(cx, cy, cellW, cellH);
+            ctx.fillStyle = '#92400e';
+            ctx.font = `700 ${Math.round(cellH * 0.38)}px Arial, sans-serif`;
             ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
             ctx.fillText('FREE', cx + cellW / 2, cy + cellH / 2);
           } else {
             ctx.fillStyle = 'white'; ctx.fillRect(cx, cy, cellW, cellH);
-            ctx.fillStyle = '#0F172A';
+            ctx.fillStyle = '#1e293b';
             const text = String(val);
             let fs = Math.round(cellH * 0.85);
             ctx.font = `700 ${fs}px Arial, sans-serif`;
@@ -313,23 +501,22 @@
             }
             ctx.fillText(text, cx + cellW / 2, cy + cellH / 2);
           }
-          ctx.strokeStyle = '#CBD5E1'; ctx.lineWidth = 2;
+          ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 2;
           ctx.strokeRect(cx, cy, cellW, cellH);
         }
       }
-      ctx.strokeStyle = '#1E293B'; ctx.lineWidth = 5; ctx.strokeRect(x, y, w, h);
+      ctx.strokeStyle = '#6366f1'; ctx.lineWidth = 5; ctx.strokeRect(x, y, w, h);
     }
 
     function printCards() {
       if (!generatedCards.length) return;
       const btn = document.getElementById('printBtn');
       btn.disabled = true;
-      btn.innerHTML = `<span style="display:inline-flex;align-items:center;gap:8px;">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-          stroke-width="2.5" stroke-linecap="round"
-          style="animation:spin .8s linear infinite;transform-origin:center;">
-          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
-        </svg>作成中…</span>`;
+      btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2.5" stroke-linecap="round"
+        style="animation:spin .8s linear infinite;transform-origin:center;">
+        <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+      </svg>作成中…`;
 
       setTimeout(() => {
         const VPAD = 170;
@@ -352,7 +539,7 @@
             drawCard(ctx, generatedCards[i + 1], HPAD + cardW + GAP, cardY, cardW, cardH);
             const cutX = Math.round(HPAD + cardW + GAP / 2);
             ctx.save();
-            ctx.strokeStyle = '#444'; ctx.lineWidth = 2; ctx.setLineDash([14, 9]);
+            ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2; ctx.setLineDash([14, 9]);
             ctx.beginPath(); ctx.moveTo(cutX, 0); ctx.lineTo(cutX, PH); ctx.stroke();
             ctx.setLineDash([]); ctx.restore();
           }
@@ -368,7 +555,11 @@
         window.open(URL.createObjectURL(doc.output('blob')), '_blank');
 
         btn.disabled = false;
-        btn.innerHTML = 'PDF 出力';
+        btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>PDF 出力`;
       }, 50);
     }
   </script>
