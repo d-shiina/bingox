@@ -167,8 +167,11 @@
                 class="w-10 h-10 rounded-lg flex items-center justify-center text-white text-lg font-bold disabled:opacity-30"
                 style="background:#334155; touch-action:manipulation;" disabled>›</button>
             </div>
-            <div id="sliderTrack" class="flex rounded-xl overflow-hidden"
-              style="overflow-x:scroll; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; scrollbar-width:none;">
+            <!-- overflow:hidden wrapper でクリップ、内側 track がスクロール -->
+            <div style="overflow:hidden; border-radius:12px;">
+              <div id="sliderTrack"
+                style="display:flex; overflow-x:scroll; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; scrollbar-width:none;">
+              </div>
             </div>
           </div>
           <button id="printBtn" onclick="printCards()"
@@ -189,9 +192,8 @@
 
     function slideTo(idx) {
       const track = document.getElementById('sliderTrack');
-      const slideW = track.querySelector('div') ? track.querySelector('div').offsetWidth : track.clientWidth;
       currentSlide = Math.max(0, Math.min(idx, totalSlides - 1));
-      track.scrollTo({ left: currentSlide * slideW, behavior: 'smooth' });
+      track.scrollTo({ left: currentSlide * track.clientWidth, behavior: 'smooth' });
       document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
       document.getElementById('prevBtn').disabled = currentSlide === 0;
       document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
@@ -256,20 +258,18 @@
         generatedCards.push(cells);
       }
 
-      // セクションを先に表示してから clientWidth を取得
       document.getElementById('emptyState').style.display = 'none';
       document.getElementById('sliderSection').style.display = '';
 
       const track = document.getElementById('sliderTrack');
-      const slideW = track.clientWidth; // display後にアクセス → 正しい幅を取得
       track.innerHTML = '';
       track.scrollLeft = 0;
       totalSlides = 0;
 
       for (let i = 0; i < generatedCards.length; i++) {
         const slide = document.createElement('div');
-        slide.className = 'flex justify-center items-center flex-shrink-0 py-4';
-        slide.style.cssText = `scroll-snap-align:start; width:${slideW}px;`;
+        // flex:0 0 100% = 幅は常に track の 100%（親コンテナ幅）
+        slide.style.cssText = 'flex:0 0 100%; display:flex; justify-content:center; align-items:center; padding:16px 0; scroll-snap-align:start;';
         slide.innerHTML = cardHTML(generatedCards[i]);
         track.appendChild(slide);
         totalSlides++;
@@ -282,8 +282,8 @@
 
       // スクロールでページカウンター同期
       track.onscroll = () => {
-        if (!slideW) return;
-        const idx = Math.round(track.scrollLeft / slideW);
+        if (!track.clientWidth) return;
+        const idx = Math.round(track.scrollLeft / track.clientWidth);
         if (idx !== currentSlide) {
           currentSlide = idx;
           document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
