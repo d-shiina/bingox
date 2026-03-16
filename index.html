@@ -257,6 +257,7 @@
 
       const track = document.getElementById('sliderTrack');
       track.innerHTML = '';
+      track.scrollLeft = 0;
       totalSlides = 0;
 
       for (let i = 0; i < generatedCards.length; i++) {
@@ -275,6 +276,7 @@
 
       // スクロールでページカウンター同期
       track.onscroll = () => {
+        if (!track.clientWidth) return;
         const idx = Math.round(track.scrollLeft / track.clientWidth);
         if (idx !== currentSlide) {
           currentSlide = idx;
