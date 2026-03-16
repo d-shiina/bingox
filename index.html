@@ -197,6 +197,7 @@
 
   <div id="cardsPreview"></div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     let generatedCards = [];
 
@@ -390,30 +391,19 @@
         dataURLs.push(canvas.toDataURL('image/png'));
       }
 
-      const pageDivs = dataURLs.map((url, i) =>
-        `<div class="page"${i === dataURLs.length - 1 ? ' style="page-break-after:avoid;break-after:avoid;"' : ''}><img src="${url}"></div>`
-      ).join('\n');
+      // jsPDFでA4横PDFを生成
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
 
-      const html = `<!DOCTYPE html>
-<html><head><meta charset="UTF-8"><style>
-  @page { size: A4 landscape; margin: 0; }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { width: 297mm; height: 210mm; overflow: hidden; background: white; }
-  .page { width: 297mm; height: 210mm; overflow: hidden; page-break-after: always; break-after: page; }
-  .page img { width: 100%; height: 100%; display: block; }
-</style></head>
-<body>
-${pageDivs}
-<script>window.onload = function(){ setTimeout(function(){ window.print(); }, 400); }<\/script>
-</body></html>`;
-
-      const win = window.open('', '_blank');
-      if (win) {
-        win.document.write(html);
-        win.document.close();
-      } else {
-        alert('ポップアップがブロックされました。ブラウザの設定でポップアップを許可してください。');
+      for (let i = 0; i < dataURLs.length; i++) {
+        if (i > 0) doc.addPage();
+        doc.addImage(dataURLs[i], 'PNG', 0, 0, 297, 210);
       }
+
+      // iOSはblobURLでPDFを開ける
+      const blob = doc.output('blob');
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank');
     }
   </script>
 
