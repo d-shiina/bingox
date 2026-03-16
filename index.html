@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ビンゴカード生成</title>
+  <style>
+    /* ===== SCREEN ===== */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+      background: #e8eaf6;
+      padding: 24px;
+      color: #222;
+    }
+
+    .screen-only h1 {
+      text-align: center;
+      font-size: 32px;
+      font-weight: 900;
+      margin-bottom: 24px;
+      color: #1a237e;
+      letter-spacing: 2px;
+    }
+
+    .settings-panel {
+      background: white;
+      border-radius: 16px;
+      padding: 28px;
+      max-width: 580px;
+      margin: 0 auto 20px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+
+    .setting-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .setting-row:last-child { margin-bottom: 0; }
+
+    .setting-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .setting-item label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .setting-item input,
+    .setting-item select {
+      padding: 10px 14px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: 600;
+      transition: border-color 0.2s;
+    }
+
+    .setting-item input:focus,
+    .setting-item select:focus {
+      outline: none;
+      border-color: #3f51b5;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      max-width: 580px;
+      margin: 0 auto 32px;
+    }
+
+    .btn {
+      padding: 14px 36px;
+      font-size: 18px;
+      font-weight: 800;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.1s;
+      letter-spacing: 1px;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    }
+
+    .btn:active { transform: translateY(0); }
+
+    .btn-generate { background: #43a047; color: white; }
+    .btn-print    { background: #1e88e5; color: white; }
+
+    .error-msg {
+      color: #c62828;
+      font-weight: 700;
+      font-size: 14px;
+      margin-top: 6px;
+    }
+
+    /* ===== CARD (shared screen + print) ===== */
+    .page-wrapper {
+      width: 210mm;
+      min-height: 297mm;
+      background: white;
+      margin: 0 auto 24px;
+      padding: 12mm 12mm;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly;
+      align-items: center;
+      gap: 6mm;
+    }
+
+    .bingo-card {
+      width: 182mm;
+      border: 3px solid #1a237e;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .bingo-header {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      background: #1a237e;
+    }
+
+    .bingo-header-cell {
+      color: white;
+      font-size: 30pt;
+      font-weight: 900;
+      text-align: center;
+      padding: 5mm 0;
+      border-right: 1px solid rgba(255,255,255,0.25);
+    }
+
+    .bingo-header-cell:last-child { border-right: none; }
+
+    .bingo-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+    }
+
+    .bingo-cell {
+      height: 23mm;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26pt;
+      font-weight: 800;
+      border: 1px solid #9fa8da;
+      color: #1a237e;
+      background: white;
+    }
+
+    .bingo-cell.free-cell {
+      background: #fff9c4;
+      font-size: 16pt;
+      font-weight: 900;
+      color: #f57f17;
+      letter-spacing: 1px;
+    }
+
+    .bingo-card-label {
+      text-align: center;
+      font-size: 9pt;
+      color: #aaa;
+      padding: 2mm 0;
+      background: white;
+    }
+
+    /* ===== PRINT ===== */
+    @media print {
+      body {
+        background: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .screen-only { display: none !important; }
+
+      .page-wrapper {
+        width: 100%;
+        min-height: 100vh;
+        margin: 0;
+        padding: 10mm 12mm;
+        box-shadow: none;
+        page-break-after: always;
+        break-after: page;
+      }
+
+      .page-wrapper:last-child {
+        page-break-after: avoid;
+        break-after: avoid;
+      }
+
+      @page {
+        size: A4 portrait;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="screen-only">
+    <h1>ビンゴカード生成</h1>
+
+    <div class="settings-panel">
+      <div class="setting-row">
+        <div class="setting-item">
+          <label>数字の最小値</label>
+          <input type="number" id="numMin" value="1" min="1" max="999">
+        </div>
+        <div class="setting-item">
+          <label>数字の最大値</label>
+          <input type="number" id="numMax" value="75" min="1" max="999">
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-item">
+          <label>生成枚数</label>
+          <select id="numCards">
+            <option value="1">1枚</option>
+            <option value="2" selected>2枚</option>
+            <option value="4">4枚</option>
+            <option value="6">6枚</option>
+            <option value="8">8枚</option>
+            <option value="10">10枚</option>
+          </select>
+        </div>
+        <div class="setting-item">
+          <label>真ん中のマス</label>
+          <select id="centerType">
+            <option value="free">FREE（穴あき）</option>
+            <option value="number">数字</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="action-buttons">
+      <button class="btn btn-generate" onclick="generateCards()">生成</button>
+      <button class="btn btn-print" id="printBtn" onclick="window.print()" style="display:none">印刷</button>
+    </div>
+  </div>
+
+  <div id="cardsPreview"></div>
+
+  <script>
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function generateCells(min, max, centerFree) {
+      const needed = centerFree ? 24 : 25;
+      const pool = [];
+      for (let i = min; i <= max; i++) pool.push(i);
+      if (pool.length < needed) {
+        alert(`数字の範囲が足りません。${needed}個以上の数字が必要ですが、現在 ${pool.length} 個です。`);
+        return null;
+      }
+      const nums = shuffle(pool).slice(0, needed);
+      const cells = [];
+      for (let i = 0; i < 25; i++) {
+        if (centerFree && i === 12) {
+          cells.push(null);
+        } else {
+          cells.push(nums.pop());
+        }
+      }
+      return cells;
+    }
+
+    function cardHTML(cells, label) {
+      const headers = ['B', 'I', 'N', 'G', 'O'];
+      let h = '<div class="bingo-card">';
+      h += '<div class="bingo-header">';
+      for (const ch of headers) {
+        h += `<div class="bingo-header-cell">${ch}</div>`;
+      }
+      h += '</div><div class="bingo-grid">';
+      for (const val of cells) {
+        if (val === null) {
+          h += '<div class="bingo-cell free-cell">FREE</div>';
+        } else {
+          h += `<div class="bingo-cell">${val}</div>`;
+        }
+      }
+      h += '</div>';
+      h += `<div class="bingo-card-label">${label}</div>`;
+      h += '</div>';
+      return h;
+    }
+
+    function generateCards() {
+      const min = parseInt(document.getElementById('numMin').value, 10);
+      const max = parseInt(document.getElementById('numMax').value, 10);
+      const count = parseInt(document.getElementById('numCards').value, 10);
+      const centerFree = document.getElementById('centerType').value === 'free';
+
+      if (isNaN(min) || isNaN(max) || min >= max) {
+        alert('最小値は最大値より小さい値を入力してください。');
+        return;
+      }
+
+      const preview = document.getElementById('cardsPreview');
+      preview.innerHTML = '';
+
+      const allCells = [];
+      for (let i = 0; i < count; i++) {
+        const cells = generateCells(min, max, centerFree);
+        if (!cells) return;
+        allCells.push(cells);
+      }
+
+      for (let i = 0; i < allCells.length; i += 2) {
+        const page = document.createElement('div');
+        page.className = 'page-wrapper';
+        page.innerHTML = cardHTML(allCells[i], `Card ${i + 1}  /  ${min}〜${max}`);
+        if (allCells[i + 1]) {
+          page.innerHTML += cardHTML(allCells[i + 1], `Card ${i + 2}  /  ${min}〜${max}`);
+        }
+        preview.appendChild(page);
+      }
+
+      document.getElementById('printBtn').style.display = 'inline-block';
+    }
+  </script>
+
+</body>
+</html>
