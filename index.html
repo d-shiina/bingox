@@ -273,7 +273,8 @@
     }
 
     // ===== Canvas → PDF =====
-    const PW = 1748, PH = 1240, PAD = 60, GAP = 48;
+    // PAD = GAP/2 にすることで切断後の内外余白を均等に
+    const PW = 1748, PH = 1240, PAD = 42, GAP = 84;
 
     function drawCard(ctx, cells, x, y, w, h) {
       const cellW = w / 5, cellH = cellW;
