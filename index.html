@@ -33,8 +33,8 @@
     .hero-bg::before {
       content: '';
       position: absolute; inset: 0;
-      background: radial-gradient(ellipse 600px 300px at 80% 40%, rgba(99,102,241,.15), transparent),
-                  radial-gradient(ellipse 400px 200px at 20% 80%, rgba(14,165,233,.1), transparent);
+      background: radial-gradient(ellipse 600px 300px at 80% 40%, rgba(148,163,184,.1), transparent),
+                  radial-gradient(ellipse 400px 200px at 20% 80%, rgba(100,116,139,.08), transparent);
       pointer-events: none;
     }
 
@@ -63,8 +63,8 @@
     }
     .field-group input:focus,
     .field-group select:focus {
-      border-color: #6366f1;
-      box-shadow: 0 0 0 3px rgba(99,102,241,.12);
+      border-color: #475569;
+      box-shadow: 0 0 0 3px rgba(71,85,105,.1);
       background: #fff;
     }
     .field-group input:hover,
@@ -87,18 +87,18 @@
       font-family: inherit;
       font-size: 14px; font-weight: 600; letter-spacing: .01em;
       color: #fff;
-      background: linear-gradient(135deg, #6366f1, #4f46e5);
-      box-shadow: 0 1px 2px rgba(99,102,241,.3), 0 4px 12px rgba(99,102,241,.2);
+      background: linear-gradient(135deg, #334155, #1e293b);
+      box-shadow: 0 1px 2px rgba(30,41,59,.3), 0 4px 12px rgba(30,41,59,.15);
       transition: all .2s cubic-bezier(.4,0,.2,1);
       touch-action: manipulation;
     }
     .btn-primary:hover:not(:disabled) {
-      box-shadow: 0 2px 4px rgba(99,102,241,.3), 0 8px 20px rgba(99,102,241,.25);
+      box-shadow: 0 2px 4px rgba(30,41,59,.3), 0 8px 20px rgba(30,41,59,.2);
       transform: translateY(-1px);
     }
     .btn-primary:active:not(:disabled) {
       transform: translateY(0);
-      box-shadow: 0 1px 2px rgba(99,102,241,.3);
+      box-shadow: 0 1px 2px rgba(30,41,59,.3);
     }
     .btn-primary:disabled { opacity: .6; cursor: default; }
 
@@ -164,7 +164,7 @@
     }
     .bingo-header {
       display: grid; grid-template-columns: repeat(5, 1fr);
-      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      background: linear-gradient(135deg, #334155, #1e293b);
     }
     .bingo-header-cell {
       color: white;
@@ -225,11 +225,6 @@
     }
     .fade-in { animation: fadeIn .4s cubic-bezier(.4,0,.2,1) both; }
 
-    /* ── Responsive tweaks ── */
-    @media (max-width: 1023px) {
-      .mobile-order-settings { order: 2; }
-      .mobile-order-preview  { order: 1; }
-    }
   </style>
 </head>
 
@@ -240,7 +235,7 @@
     <div class="max-w-6xl mx-auto px-5 sm:px-8 py-5 sm:py-6 flex items-end justify-between relative z-10">
       <div>
         <div class="flex items-center gap-2 mb-1">
-          <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center">
+          <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-slate-400 to-slate-600 flex items-center justify-center">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
               <rect x="3" y="3" width="18" height="18" rx="2"/>
               <line x1="3" y1="9" x2="21" y2="9"/>
@@ -249,7 +244,7 @@
               <line x1="3" y1="15" x2="21" y2="15"/>
             </svg>
           </div>
-          <p class="text-[11px] font-semibold tracking-[.12em] text-indigo-300/80 uppercase">Bingo Card Generator</p>
+          <p class="text-[11px] font-semibold tracking-[.12em] text-slate-400/80 uppercase">Bingo Card Generator</p>
         </div>
         <h1 class="text-white text-xl sm:text-2xl font-bold tracking-tight">ビンゴカード生成</h1>
       </div>
@@ -258,106 +253,91 @@
   </header>
 
   <!-- ━━ Main ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
-  <main class="max-w-6xl mx-auto px-5 sm:px-8 py-6 sm:py-8">
-    <div class="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 items-start">
+  <main class="max-w-5xl mx-auto px-5 sm:px-8 py-6 sm:py-8">
 
-      <!-- ── Preview (left / top on mobile) ── -->
-      <div id="previewCol" class="mobile-order-preview">
-
-        <!-- Empty state -->
-        <div id="emptyState" class="card-panel flex flex-col items-center justify-center py-20 sm:py-24">
-          <div class="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center mb-4">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round">
-              <rect x="3" y="3" width="18" height="18" rx="2"/>
-              <line x1="3" y1="9" x2="21" y2="9"/>
-              <line x1="9" y1="9" x2="9" y2="21"/>
-              <line x1="15" y1="9" x2="15" y2="21"/>
-              <line x1="3" y1="15" x2="21" y2="15"/>
-            </svg>
+    <!-- ── Settings (top) ── -->
+    <div class="card-panel p-5 sm:p-6 mb-6">
+      <div class="flex flex-col sm:flex-row sm:items-end gap-4 sm:gap-5">
+        <div class="flex-1 grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="field-group">
+            <label for="numMin">最小値</label>
+            <input type="number" id="numMin" value="1" min="1" max="999">
           </div>
-          <p class="text-sm font-medium text-slate-400">設定して「生成」ボタンを押してください</p>
-        </div>
-
-        <!-- Slider section -->
-        <div id="sliderSection" style="display:none;" class="flex flex-col gap-4 fade-in">
-          <div class="card-panel p-4 sm:p-5">
-            <!-- Nav -->
-            <div class="flex items-center justify-between mb-2 px-1">
-              <button id="prevBtn" onclick="slideTo(currentSlide - 1)"
-                class="nav-btn" disabled>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-              </button>
-              <span id="slideCounter" class="slide-pill">1 / 1</span>
-              <button id="nextBtn" onclick="slideTo(currentSlide + 1)"
-                class="nav-btn" disabled>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-              </button>
-            </div>
-            <!-- Card display -->
-            <div id="cardDisplay"
-              ontouchstart="touchStart(event)" ontouchend="touchEnd(event)">
-            </div>
+          <div class="field-group">
+            <label for="numMax">最大値</label>
+            <input type="number" id="numMax" value="75" min="1" max="999">
           </div>
-
-          <button id="printBtn" onclick="printCards()" class="btn-dark w-full">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="7 10 12 15 17 10"/>
-              <line x1="12" y1="15" x2="12" y2="3"/>
-            </svg>
-            PDF 出力
-          </button>
+          <div class="field-group">
+            <label for="numCards">生成枚数</label>
+            <input type="number" id="numCards" value="2" min="1" max="100">
+          </div>
+          <div class="field-group">
+            <label for="centerType">中央マス</label>
+            <select id="centerType">
+              <option value="number" selected>数字</option>
+              <option value="free">FREE</option>
+            </select>
+          </div>
         </div>
+        <button onclick="generateCards()" class="btn-primary sm:w-auto w-full shrink-0" style="min-width:120px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+          生成
+        </button>
+      </div>
+    </div>
 
+    <!-- ── Preview ── -->
+    <div id="previewCol">
+
+      <!-- Empty state -->
+      <div id="emptyState" class="card-panel flex flex-col items-center justify-center py-20 sm:py-24">
+        <div class="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center mb-4">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <line x1="3" y1="9" x2="21" y2="9"/>
+            <line x1="9" y1="9" x2="9" y2="21"/>
+            <line x1="15" y1="9" x2="15" y2="21"/>
+            <line x1="3" y1="15" x2="21" y2="15"/>
+          </svg>
+        </div>
+        <p class="text-sm font-medium text-slate-400">設定して「生成」ボタンを押してください</p>
       </div>
 
-      <!-- ── Settings (right sidebar / bottom on mobile) ── -->
-      <div class="lg:sticky lg:top-6 mobile-order-settings">
-        <div class="card-panel p-5 sm:p-6">
-          <div class="flex items-center gap-2 mb-5">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
-              <circle cx="12" cy="12" r="3"/>
-            </svg>
-            <p class="text-xs font-semibold tracking-[.08em] text-slate-400 uppercase">Settings</p>
+      <!-- Slider section -->
+      <div id="sliderSection" style="display:none;" class="flex flex-col gap-4 fade-in">
+        <div class="card-panel p-4 sm:p-5">
+          <!-- Nav -->
+          <div class="flex items-center justify-between mb-2 px-1">
+            <button id="prevBtn" onclick="slideTo(currentSlide - 1)"
+              class="nav-btn" disabled>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+            <span id="slideCounter" class="slide-pill">1 / 1</span>
+            <button id="nextBtn" onclick="slideTo(currentSlide + 1)"
+              class="nav-btn" disabled>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
           </div>
-
-          <div class="space-y-4 mb-6">
-            <div class="grid grid-cols-2 gap-3">
-              <div class="field-group">
-                <label for="numMin">最小値</label>
-                <input type="number" id="numMin" value="1" min="1" max="999">
-              </div>
-              <div class="field-group">
-                <label for="numMax">最大値</label>
-                <input type="number" id="numMax" value="75" min="1" max="999">
-              </div>
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-              <div class="field-group">
-                <label for="numCards">生成枚数</label>
-                <input type="number" id="numCards" value="2" min="1" max="100">
-              </div>
-              <div class="field-group">
-                <label for="centerType">中央マス</label>
-                <select id="centerType">
-                  <option value="number" selected>数字</option>
-                  <option value="free">FREE</option>
-                </select>
-              </div>
-            </div>
+          <!-- Card display -->
+          <div id="cardDisplay"
+            ontouchstart="touchStart(event)" ontouchend="touchEnd(event)">
           </div>
-
-          <button onclick="generateCards()" class="btn-primary w-full">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-            </svg>
-            生成
-          </button>
         </div>
+
+        <button id="printBtn" onclick="printCards()" class="btn-dark w-full">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          PDF 出力
+        </button>
       </div>
 
     </div>
+
   </main>
 
   <!-- ━━ Scripts ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
@@ -470,7 +450,7 @@
       const HEADER_H = h - cellH * 5;
 
       ctx.fillStyle = 'white'; ctx.fillRect(x, y, w, h);
-      ctx.fillStyle = '#6366f1'; ctx.fillRect(x, y, w, HEADER_H);
+      ctx.fillStyle = '#1e293b'; ctx.fillRect(x, y, w, HEADER_H);
 
       const headers = ['B','I','N','G','O'];
       ctx.fillStyle = 'white'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
@@ -505,7 +485,7 @@
           ctx.strokeRect(cx, cy, cellW, cellH);
         }
       }
-      ctx.strokeStyle = '#6366f1'; ctx.lineWidth = 5; ctx.strokeRect(x, y, w, h);
+      ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 5; ctx.strokeRect(x, y, w, h);
     }
 
     function printCards() {
