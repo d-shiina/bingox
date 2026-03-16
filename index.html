@@ -126,15 +126,10 @@
         </div>
       </div>
 
-      <div class="flex justify-end gap-3 mt-2">
+      <div class="flex justify-end mt-2">
         <button onclick="generateCards()" class="m3-btn text-white"
           style="background:#334155; box-shadow:0 1px 2px rgba(0,0,0,.3),0 2px 6px rgba(0,0,0,.15);">
           生成
-        </button>
-        <button id="printBtn" onclick="printCards()"
-          style="display:none; background:#0F172A; box-shadow:0 1px 2px rgba(0,0,0,.3),0 2px 6px rgba(0,0,0,.15);"
-          class="m3-btn text-white">
-          PDF 出力
         </button>
       </div>
 
@@ -159,6 +154,14 @@
       class="flex rounded-xl overflow-hidden"
       style="overflow-x:scroll; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; scrollbar-width:none;">
     </div>
+    </div>
+    <!-- PDF button -->
+    <div id="printBtnWrap" class="mt-3" style="display:none">
+      <button id="printBtn" onclick="printCards()"
+        class="m3-btn text-white w-full"
+        style="background:#0F172A; box-shadow:0 1px 2px rgba(0,0,0,.3),0 2px 6px rgba(0,0,0,.15);">
+        PDF 出力
+      </button>
     </div>
   </section>
 
@@ -239,12 +242,11 @@
       track.innerHTML = '';
       totalSlides = 0;
 
-      for (let i = 0; i < generatedCards.length; i += 2) {
+      for (let i = 0; i < generatedCards.length; i++) {
         const slide = document.createElement('div');
-        slide.className = 'flex flex-wrap gap-4 justify-center items-start flex-shrink-0 w-full';
+        slide.className = 'flex justify-center items-start flex-shrink-0 w-full py-2';
         slide.style.cssText = 'scroll-snap-align:start; min-width:100%;';
         slide.innerHTML = cardHTML(generatedCards[i]);
-        if (generatedCards[i + 1]) slide.innerHTML += cardHTML(generatedCards[i + 1]);
         track.appendChild(slide);
         totalSlides++;
       }
@@ -265,7 +267,7 @@
         }
       };
 
-      document.getElementById('printBtn').style.display = '';
+      document.getElementById('printBtnWrap').style.display = '';
       document.getElementById('sliderSection').style.display = '';
       document.getElementById('sliderSection').scrollIntoView({ behavior: 'smooth' });
     }
