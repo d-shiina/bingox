@@ -141,18 +141,38 @@
   </main>
 
   <!-- Slider -->
-  <section id="sliderSection" class="pb-8" style="display:none">
-    <div id="sliderTrack"
-      class="flex overflow-x-auto pb-4"
-      style="scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; scrollbar-width:none;">
+  <section id="sliderSection" class="pb-8 max-w-lg mx-auto px-4" style="display:none">
+    <!-- Nav bar -->
+    <div class="flex items-center justify-between mb-3">
+      <button id="prevBtn" onclick="slidePrev()"
+        class="w-10 h-10 rounded-lg flex items-center justify-center text-white text-lg font-bold disabled:opacity-30"
+        style="background:#334155;" disabled>‹</button>
+      <span id="slideCounter" class="text-sm font-medium" style="color:#475569;">1 / 1</span>
+      <button id="nextBtn" onclick="slideNext()"
+        class="w-10 h-10 rounded-lg flex items-center justify-center text-white text-lg font-bold disabled:opacity-30"
+        style="background:#334155;" disabled>›</button>
     </div>
-    <!-- Dot indicators -->
-    <div id="sliderDots" class="flex justify-center gap-2 mt-3"></div>
+    <div id="sliderTrack"
+      class="flex overflow-x-hidden"
+      style="scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;">
+    </div>
   </section>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     let generatedCards = [];
+    let currentSlide = 0, totalSlides = 0;
+
+    function slideTo(idx) {
+      const track = document.getElementById('sliderTrack');
+      currentSlide = Math.max(0, Math.min(idx, totalSlides - 1));
+      track.scrollTo({ left: currentSlide * track.clientWidth, behavior: 'smooth' });
+      document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+      document.getElementById('prevBtn').disabled = currentSlide === 0;
+      document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+    }
+    function slidePrev() { slideTo(currentSlide - 1); }
+    function slideNext() { slideTo(currentSlide + 1); }
 
     function shuffle(arr) {
       const a = [...arr];
@@ -212,40 +232,23 @@
       }
 
       const track = document.getElementById('sliderTrack');
-      const dots  = document.getElementById('sliderDots');
       track.innerHTML = '';
-      dots.innerHTML  = '';
+      totalSlides = 0;
 
-      const pages = [];
       for (let i = 0; i < generatedCards.length; i += 2) {
         const slide = document.createElement('div');
-        slide.className = 'flex flex-wrap gap-4 justify-center items-start';
-        slide.style.cssText = 'scroll-snap-align:start; flex-shrink:0; width:100vw; padding:0 16px; box-sizing:border-box;';
+        slide.className = 'flex flex-wrap gap-4 justify-center items-start flex-shrink-0 w-full';
+        slide.style.cssText = 'scroll-snap-align:start; min-width:100%;';
         slide.innerHTML = cardHTML(generatedCards[i]);
         if (generatedCards[i + 1]) slide.innerHTML += cardHTML(generatedCards[i + 1]);
         track.appendChild(slide);
-        pages.push(slide);
-
-        const dot = document.createElement('div');
-        dot.style.cssText = 'width:8px;height:8px;border-radius:50%;background:#CBD5E1;transition:background .2s,transform .2s;';
-        dots.appendChild(dot);
+        totalSlides++;
       }
 
-      // Dot highlight on scroll
-      if (pages.length > 1) {
-        const observer = new IntersectionObserver(entries => {
-          entries.forEach(e => {
-            const idx = pages.indexOf(e.target);
-            if (idx >= 0) {
-              dots.children[idx].style.background = e.isIntersecting ? '#1E293B' : '#CBD5E1';
-              dots.children[idx].style.transform  = e.isIntersecting ? 'scale(1.3)' : 'scale(1)';
-            }
-          });
-        }, { root: track, threshold: 0.6 });
-        pages.forEach(p => observer.observe(p));
-      } else {
-        dots.style.display = 'none';
-      }
+      currentSlide = 0;
+      document.getElementById('slideCounter').textContent = `1 / ${totalSlides}`;
+      document.getElementById('prevBtn').disabled = true;
+      document.getElementById('nextBtn').disabled = totalSlides <= 1;
 
       document.getElementById('printBtn').style.display = '';
       document.getElementById('sliderSection').style.display = '';
@@ -331,6 +334,29 @@
         drawCard(ctx, generatedCards[i], PAD, cardY, cardW, cardH);
         if (generatedCards[i + 1]) {
           drawCard(ctx, generatedCards[i + 1], PAD + cardW + GAP, cardY, cardW, cardH);
+          // 切り取り線（2枚目がある場合のみ）
+          const cutX = Math.round(PAD + cardW + GAP / 2);
+          ctx.save();
+          ctx.strokeStyle = '#AAAAAA';
+          ctx.lineWidth = 3;
+          ctx.setLineDash([18, 12]);
+          ctx.beginPath();
+          ctx.moveTo(cutX, 0);
+          ctx.lineTo(cutX, PH);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          // ハサミ記号（上・下）
+          ctx.font = '56px Arial';
+          ctx.fillStyle = '#AAAAAA';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('✂', cutX, 48);
+          ctx.save();
+          ctx.translate(cutX, PH - 48);
+          ctx.rotate(Math.PI);
+          ctx.fillText('✂', 0, 0);
+          ctx.restore();
+          ctx.restore();
         }
         dataURLs.push(canvas.toDataURL('image/png'));
       }
