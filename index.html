@@ -175,17 +175,16 @@
       }
 
       /*
-       * iOS Safari は @page margin を無視しがち。
-       * padding をページラッパー側に持たせ、
-       * width/height は 100vw/100vh でブラウザが決めるページサイズに追従させる。
+       * 100vw/100vh はモバイルの画面サイズになるため、A4固定サイズを使う。
+       * iOS Safari は @page margin を無視しがちなので padding で余白を確保する。
        */
       .page-wrapper {
         display: flex;
         flex-direction: row;
         flex-wrap: nowrap;
         align-items: stretch;
-        width: 100vw;
-        height: 100vh;
+        width: 297mm;
+        height: 210mm;
         padding: 8mm 10mm;
         gap: 5mm;
         border-radius: 0;
@@ -214,8 +213,8 @@
       }
 
       .bingo-header-cell {
-        font-size: 20pt;
-        padding: 2.5mm 0;
+        font-size: 26pt;
+        padding: 2mm 0;
       }
 
       /* グリッドが残り高さをすべて使う */
@@ -228,11 +227,11 @@
       .bingo-cell {
         aspect-ratio: unset;
         height: auto;
-        font-size: 30pt;
+        font-size: 44pt;
       }
 
       .bingo-cell.free-cell {
-        font-size: 16pt;
+        font-size: 22pt;
       }
     }
   </style>
