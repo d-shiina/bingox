@@ -291,10 +291,9 @@
     const PAD = 60, GAP = 48;
 
     function drawCard(ctx, cells, x, y, w, h) {
-      const HEADER_H = Math.round(h * 0.12);
-      const gridH = h - HEADER_H;
       const cellW = w / 5;
-      const cellH = gridH / 5;
+      const cellH = cellW; // 正方形セル
+      const HEADER_H = h - cellH * 5; // 残りをヘッダーに
 
       // カード背景
       ctx.fillStyle = 'white';
@@ -365,8 +364,13 @@
     function printCards() {
       if (generatedCards.length === 0) return;
 
+      // cellWを決めてcardHを逆算し正方形セルにする
       const cardW = Math.round((PW - PAD * 2 - GAP) / 2);
-      const cardH = PH - PAD * 2;
+      const cellW = cardW / 5;
+      const headerH = Math.round(cellW * 0.8); // BINGOヘッダー高さ
+      const cardH = headerH + Math.round(cellW * 5);
+      // 縦方向センタリング
+      const cardY = PAD + Math.round((PH - PAD * 2 - cardH) / 2);
       const dataURLs = [];
 
       for (let i = 0; i < generatedCards.length; i += 2) {
@@ -378,9 +382,9 @@
         ctx.fillStyle = 'white';
         ctx.fillRect(0, 0, PW, PH);
 
-        drawCard(ctx, generatedCards[i], PAD, PAD, cardW, cardH);
+        drawCard(ctx, generatedCards[i], PAD, cardY, cardW, cardH);
         if (generatedCards[i + 1]) {
-          drawCard(ctx, generatedCards[i + 1], PAD + cardW + GAP, PAD, cardW, cardH);
+          drawCard(ctx, generatedCards[i + 1], PAD + cardW + GAP, cardY, cardW, cardH);
         }
 
         dataURLs.push(canvas.toDataURL('image/png'));
