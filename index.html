@@ -4,120 +4,118 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ビンゴカード生成</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { sans: ['Roboto', 'sans-serif'] },
-          colors: {
-            primary:   { DEFAULT: '#303F9F', light: '#3F51B5', dark: '#1A237E' },
-            surface:   '#FFFFFF',
-            bg:        '#ECEFF1',
-            'on-primary': '#FFFFFF',
-            'text-primary':   '#212121',
-            'text-secondary': '#757575',
-          },
-          boxShadow: {
-            'md1': '0 1px 3px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.24)',
-            'md2': '0 3px 6px rgba(0,0,0,.15), 0 2px 4px rgba(0,0,0,.12)',
-            'md4': '0 10px 20px rgba(0,0,0,.15), 0 3px 6px rgba(0,0,0,.10)',
-          }
-        }
-      }
-    }
-  </script>
   <style>
-    body { font-family: 'Roboto', sans-serif; }
+    * { box-sizing: border-box; }
+    body { font-family: 'Roboto', sans-serif; background: #F6F2FF; }
+    h1, button { font-family: 'Google Sans', 'Roboto', sans-serif; }
 
-    /* Outlined text field */
-    .md-field { position: relative; }
-    .md-field label {
-      position: absolute; top: -9px; left: 12px;
-      font-size: 11px; font-weight: 500; letter-spacing: .6px;
-      color: #303F9F; background: white; padding: 0 4px;
+    /* MD3 Filled Text Field */
+    .m3-field { position: relative; }
+    .m3-field input,
+    .m3-field select {
+      width: 100%;
+      background: #EDE7F6;
+      border: none;
+      border-bottom: 1px solid #7965AF;
+      border-radius: 4px 4px 0 0;
+      padding: 22px 16px 6px;
+      font-size: 16px;
+      font-family: 'Roboto', sans-serif;
+      font-weight: 500;
+      color: #1D1B20;
+      outline: none;
+      transition: border-color .2s, background .2s;
+      appearance: none;
+    }
+    .m3-field input:focus,
+    .m3-field select:focus {
+      background: #E8DEFF;
+      border-bottom: 2px solid #5B4397;
+    }
+    .m3-field label {
+      position: absolute;
+      top: 7px; left: 16px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: .5px;
+      color: #5B4397;
+      pointer-events: none;
       text-transform: uppercase;
     }
-    .md-field input, .md-field select {
-      width: 100%; border: 1.5px solid #BDBDBD; border-radius: 4px;
-      padding: 14px 16px; font-size: 16px; font-family: 'Roboto Mono', monospace;
-      font-weight: 700; color: #212121; background: white;
-      transition: border-color .2s; outline: none; appearance: none;
-    }
-    .md-field input:focus, .md-field select:focus { border-color: #303F9F; border-width: 2px; }
 
-    /* Contained button */
-    .md-btn {
-      font-family: 'Roboto', sans-serif;
-      font-size: 14px; font-weight: 500; letter-spacing: 1.25px;
-      text-transform: uppercase; border: none; border-radius: 4px;
-      padding: 0 24px; height: 48px; cursor: pointer;
+    /* MD3 Filled Button */
+    .m3-btn {
+      border: none; cursor: pointer;
+      border-radius: 100px;
+      padding: 0 28px; height: 44px;
+      font-family: 'Google Sans', 'Roboto', sans-serif;
+      font-size: 14px; font-weight: 500;
+      letter-spacing: .25px;
       transition: box-shadow .2s, filter .15s;
-      position: relative; overflow: hidden;
     }
-    .md-btn:hover { filter: brightness(1.08); }
-    .md-btn:active { filter: brightness(0.94); box-shadow: none !important; }
+    .m3-btn:hover   { filter: brightness(0.94); }
+    .m3-btn:active  { filter: brightness(0.88); box-shadow: none !important; }
 
     /* Bingo card */
     .bingo-card {
       width: clamp(260px, calc(50% - 12px), 400px);
-      border: 2px solid #1A237E; border-radius: 2px; overflow: hidden;
-      box-shadow: 0 3px 6px rgba(0,0,0,.15), 0 2px 4px rgba(0,0,0,.12);
+      border-radius: 4px; overflow: hidden;
+      box-shadow: 0 2px 8px rgba(91,67,151,.18);
     }
     .bingo-header {
       display: grid; grid-template-columns: repeat(5, 1fr);
-      background: #1A237E;
+      background: #4527A0;
     }
     .bingo-header-cell {
-      color: white; font-size: clamp(20px, 4.2vw, 42px); font-weight: 700;
-      text-align: center; padding: 4% 0;
-      border-right: 1px solid rgba(255,255,255,.12);
+      color: white; font-size: clamp(20px, 4.2vw, 42px);
+      font-weight: 700; text-align: center; padding: 4% 0;
+      border-right: 1px solid rgba(255,255,255,.1);
+      font-family: 'Google Sans', sans-serif;
     }
     .bingo-header-cell:last-child { border-right: none; }
     .bingo-grid { display: grid; grid-template-columns: repeat(5, 1fr); }
     .bingo-cell {
       aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
       font-size: clamp(22px, 5vw, 56px); font-weight: 700;
-      border: 1px solid #C5CAE9; color: #1A237E; background: white;
+      border: 1px solid #D0C9E8; color: #1D0060; background: white;
+      font-family: 'Google Sans', sans-serif;
     }
     .bingo-cell.free-cell {
-      background: #FFF8E1; font-size: clamp(12px, 2.6vw, 28px);
-      font-weight: 700; color: #E65100; letter-spacing: .5px;
+      background: #FFF3E0; font-size: clamp(12px, 2.5vw, 26px);
+      font-weight: 500; color: #BF360C; letter-spacing: .3px;
     }
   </style>
 </head>
 
-<body class="bg-[#ECEFF1] min-h-screen text-[#212121]">
+<body class="min-h-screen">
 
-  <!-- Top App Bar -->
-  <header class="bg-[#303F9F] shadow-md4 px-6 py-4 flex items-center gap-4">
-    <svg class="w-7 h-7 text-white opacity-90" fill="currentColor" viewBox="0 0 24 24">
-      <path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-7 3a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm0 14l-5-5h10l-5 5z"/>
-    </svg>
-    <h1 class="text-white text-xl font-medium tracking-wide">ビンゴカード生成</h1>
+  <!-- Top App Bar (MD3 medium) -->
+  <header style="background:#4527A0;" class="px-5 pt-3 pb-4">
+    <p class="text-xs font-medium" style="color:#D0BCFF; letter-spacing:.5px;">BINGO</p>
+    <h1 class="text-white text-2xl font-medium mt-0.5 tracking-wide">ビンゴカード生成</h1>
   </header>
 
-  <main class="max-w-lg mx-auto px-4 py-8">
+  <main class="max-w-lg mx-auto px-4 py-6 flex flex-col gap-4">
 
-    <!-- Settings card -->
-    <div class="bg-white rounded shadow-md2 p-6 mb-4">
-      <p class="text-xs font-medium text-[#757575] uppercase tracking-widest mb-5">設定</p>
+    <!-- Settings card (MD3 Surface) -->
+    <div class="bg-white rounded-3xl p-6" style="box-shadow:0 1px 3px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.06);">
 
-      <div class="grid grid-cols-2 gap-6 mb-6">
-        <div class="md-field">
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div class="m3-field">
           <label>最小値</label>
           <input type="number" id="numMin" value="1" min="1" max="999">
         </div>
-        <div class="md-field">
+        <div class="m3-field">
           <label>最大値</label>
           <input type="number" id="numMax" value="75" min="1" max="999">
         </div>
-        <div class="md-field">
+        <div class="m3-field">
           <label>生成枚数</label>
           <input type="number" id="numCards" value="2" min="1" max="100">
         </div>
-        <div class="md-field">
+        <div class="m3-field">
           <label>中央マス</label>
           <select id="centerType">
             <option value="free">FREE</option>
@@ -126,25 +124,22 @@
         </div>
       </div>
 
-      <div class="flex gap-3 justify-end pt-2 border-t border-[#EEEEEE]">
-        <button onclick="generateCards()" class="md-btn bg-[#303F9F] text-white shadow-md1">
+      <div class="flex justify-end gap-3 mt-2">
+        <button onclick="generateCards()" class="m3-btn text-white"
+          style="background:#5B4397; box-shadow:0 1px 2px rgba(0,0,0,.3),0 2px 6px rgba(0,0,0,.15);">
           生成
         </button>
-        <button id="printBtn" onclick="printCards()" style="display:none"
-          class="md-btn bg-[#00796B] text-white shadow-md1">
-          PDF出力
+        <button id="printBtn" onclick="printCards()"
+          style="display:none; background:#00695C; box-shadow:0 1px 2px rgba(0,0,0,.3),0 2px 6px rgba(0,0,0,.15);"
+          class="m3-btn text-white">
+          PDF 出力
         </button>
       </div>
-    </div>
 
-    <!-- Hint -->
-    <p class="text-xs text-[#9E9E9E] text-center tracking-wide">
-      PDF出力後、iOSの共有メニューからプリント
-    </p>
+    </div>
 
   </main>
 
-  <!-- Card preview -->
   <section id="cardsPreview" class="px-4 pb-16 max-w-3xl mx-auto"></section>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -212,7 +207,8 @@
 
       for (let i = 0; i < generatedCards.length; i += 2) {
         const page = document.createElement('div');
-        page.className = 'bg-white rounded shadow-md2 p-6 mb-4 flex flex-wrap gap-5 justify-center';
+        page.className = 'bg-white rounded-3xl p-6 mb-4 flex flex-wrap gap-5 justify-center';
+        page.style.boxShadow = '0 1px 3px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.06)';
         page.innerHTML = cardHTML(generatedCards[i]);
         if (generatedCards[i + 1]) page.innerHTML += cardHTML(generatedCards[i + 1]);
         preview.appendChild(page);
@@ -231,7 +227,7 @@
 
       ctx.fillStyle = 'white';
       ctx.fillRect(x, y, w, h);
-      ctx.fillStyle = '#1A237E';
+      ctx.fillStyle = '#4527A0';
       ctx.fillRect(x, y, w, HEADER_H);
 
       const headers = ['B','I','N','G','O'];
@@ -250,16 +246,16 @@
           const val = cells[row * 5 + col];
 
           if (val === null) {
-            ctx.fillStyle = '#FFF8E1';
+            ctx.fillStyle = '#FFF3E0';
             ctx.fillRect(cx, cy, cellW, cellH);
-            ctx.fillStyle = '#E65100';
-            ctx.font = `700 ${Math.round(cellH * 0.38)}px Arial, sans-serif`;
+            ctx.fillStyle = '#BF360C';
+            ctx.font = `500 ${Math.round(cellH * 0.38)}px Arial, sans-serif`;
             ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
             ctx.fillText('FREE', cx + cellW / 2, cy + cellH / 2);
           } else {
             ctx.fillStyle = 'white';
             ctx.fillRect(cx, cy, cellW, cellH);
-            ctx.fillStyle = '#1A237E';
+            ctx.fillStyle = '#1D0060';
             const text = String(val);
             let fs = Math.round(cellH * 0.85);
             ctx.font = `700 ${fs}px Arial, sans-serif`;
@@ -271,13 +267,13 @@
             ctx.fillText(text, cx + cellW / 2, cy + cellH / 2);
           }
 
-          ctx.strokeStyle = '#C5CAE9';
+          ctx.strokeStyle = '#D0C9E8';
           ctx.lineWidth = 2;
           ctx.strokeRect(cx, cy, cellW, cellH);
         }
       }
 
-      ctx.strokeStyle = '#1A237E';
+      ctx.strokeStyle = '#4527A0';
       ctx.lineWidth = 5;
       ctx.strokeRect(x, y, w, h);
     }
