@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ビンゴカード生成</title>
   <style>
-    /* ===== SCREEN ===== */
+    /* ===== BASE ===== */
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
@@ -15,9 +15,10 @@
       color: #222;
     }
 
+    /* ===== UI PANEL ===== */
     .screen-only h1 {
       text-align: center;
-      font-size: 32px;
+      font-size: 30px;
       font-weight: 900;
       margin-bottom: 24px;
       color: #1a237e;
@@ -27,8 +28,8 @@
     .settings-panel {
       background: white;
       border-radius: 16px;
-      padding: 28px;
-      max-width: 580px;
+      padding: 24px;
+      max-width: 560px;
       margin: 0 auto 20px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.1);
     }
@@ -39,7 +40,6 @@
       gap: 16px;
       margin-bottom: 16px;
     }
-
     .setting-row:last-child { margin-bottom: 0; }
 
     .setting-item {
@@ -49,23 +49,22 @@
     }
 
     .setting-item label {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
-      color: #555;
+      color: #666;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
 
     .setting-item input,
     .setting-item select {
-      padding: 10px 14px;
+      padding: 10px 12px;
       border: 2px solid #ddd;
       border-radius: 8px;
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 600;
       transition: border-color 0.2s;
     }
-
     .setting-item input:focus,
     .setting-item select:focus {
       outline: none;
@@ -76,13 +75,13 @@
       display: flex;
       gap: 12px;
       justify-content: center;
-      max-width: 580px;
+      max-width: 560px;
       margin: 0 auto 32px;
     }
 
     .btn {
-      padding: 14px 36px;
-      font-size: 18px;
+      padding: 13px 34px;
+      font-size: 17px;
       font-weight: 800;
       border: none;
       border-radius: 10px;
@@ -90,41 +89,30 @@
       transition: transform 0.1s, box-shadow 0.1s;
       letter-spacing: 1px;
     }
-
-    .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(0,0,0,0.2);
-    }
-
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.2); }
     .btn:active { transform: translateY(0); }
-
     .btn-generate { background: #43a047; color: white; }
     .btn-print    { background: #1e88e5; color: white; }
 
-    .error-msg {
-      color: #c62828;
-      font-weight: 700;
-      font-size: 14px;
-      margin-top: 6px;
-    }
-
-    /* ===== CARD (shared screen + print) ===== */
+    /* ===== SCREEN CARD LAYOUT ===== */
+    /* page-wrapper = visual grouping box on screen, A4 page on print */
     .page-wrapper {
-      width: 210mm;
-      min-height: 297mm;
       background: white;
+      border-radius: 12px;
+      padding: 24px;
+      max-width: 900px;
       margin: 0 auto 24px;
-      padding: 12mm 12mm;
-      box-shadow: 0 6px 24px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.13);
       display: flex;
-      flex-direction: column;
-      justify-content: space-evenly;
-      align-items: center;
-      gap: 6mm;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      align-items: flex-start;
     }
 
     .bingo-card {
-      width: 182mm;
+      /* On screen: up to 2 per row, min 280px */
+      width: clamp(280px, calc(50% - 12px), 420px);
       border: 3px solid #1a237e;
       border-radius: 4px;
       overflow: hidden;
@@ -138,13 +126,12 @@
 
     .bingo-header-cell {
       color: white;
-      font-size: 30pt;
+      font-size: clamp(20px, 4vw, 38px);
       font-weight: 900;
       text-align: center;
-      padding: 5mm 0;
-      border-right: 1px solid rgba(255,255,255,0.25);
+      padding: 4% 0;
+      border-right: 1px solid rgba(255,255,255,0.2);
     }
-
     .bingo-header-cell:last-child { border-right: none; }
 
     .bingo-grid {
@@ -153,11 +140,11 @@
     }
 
     .bingo-cell {
-      height: 23mm;
+      aspect-ratio: 1;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 26pt;
+      font-size: clamp(16px, 3.5vw, 34px);
       font-weight: 800;
       border: 1px solid #9fa8da;
       color: #1a237e;
@@ -166,7 +153,7 @@
 
     .bingo-cell.free-cell {
       background: #fff9c4;
-      font-size: 16pt;
+      font-size: clamp(11px, 2.2vw, 22px);
       font-weight: 900;
       color: #f57f17;
       letter-spacing: 1px;
@@ -174,9 +161,9 @@
 
     .bingo-card-label {
       text-align: center;
-      font-size: 9pt;
-      color: #aaa;
-      padding: 2mm 0;
+      font-size: 11px;
+      color: #bbb;
+      padding: 5px 0;
       background: white;
     }
 
@@ -190,19 +177,49 @@
 
       .screen-only { display: none !important; }
 
+      /* Each page-wrapper = one A4 page */
       .page-wrapper {
-        width: 100%;
-        min-height: 100vh;
-        margin: 0;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        justify-content: space-evenly;
+        align-items: center;
+        width: 210mm;
+        min-height: 297mm;
         padding: 10mm 12mm;
+        gap: 4mm;
+        border-radius: 0;
         box-shadow: none;
+        margin: 0;
         page-break-after: always;
         break-after: page;
       }
-
       .page-wrapper:last-child {
         page-break-after: avoid;
         break-after: avoid;
+      }
+
+      .bingo-card {
+        width: 182mm;
+      }
+
+      .bingo-header-cell {
+        font-size: 30pt;
+        padding: 5mm 0;
+      }
+
+      .bingo-cell {
+        aspect-ratio: unset;
+        height: 23mm;
+        font-size: 26pt;
+      }
+
+      .bingo-cell.free-cell {
+        font-size: 15pt;
+      }
+
+      .bingo-card-label {
+        font-size: 8pt;
       }
 
       @page {
@@ -228,7 +245,6 @@
           <input type="number" id="numMax" value="75" min="1" max="999">
         </div>
       </div>
-
       <div class="setting-row">
         <div class="setting-item">
           <label>生成枚数</label>
@@ -342,6 +358,7 @@
       }
 
       document.getElementById('printBtn').style.display = 'inline-block';
+      document.getElementById('cardsPreview').scrollIntoView({ behavior: 'smooth' });
     }
   </script>
 
