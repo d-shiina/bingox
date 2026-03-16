@@ -144,7 +144,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: clamp(22px, 5vw, 52px);
+      font-size: clamp(28px, 6.5vw, 70px);
       font-weight: 800;
       border: 1px solid #9fa8da;
       color: #1a237e;
@@ -153,18 +153,10 @@
 
     .bingo-cell.free-cell {
       background: #fff9c4;
-      font-size: clamp(13px, 2.8vw, 28px);
+      font-size: clamp(15px, 3.2vw, 34px);
       font-weight: 900;
       color: #f57f17;
       letter-spacing: 1px;
-    }
-
-    .bingo-card-label {
-      text-align: center;
-      font-size: 11px;
-      color: #bbb;
-      padding: 5px 0;
-      background: white;
     }
 
     /* ===== PRINT ===== */
@@ -236,17 +228,11 @@
       .bingo-cell {
         aspect-ratio: unset;
         height: auto;
-        font-size: 24pt;
+        font-size: 30pt;
       }
 
       .bingo-cell.free-cell {
-        font-size: 13pt;
-      }
-
-      .bingo-card-label {
-        flex-shrink: 0;
-        font-size: 7pt;
-        padding: 1mm 0;
+        font-size: 16pt;
       }
     }
   </style>
@@ -320,7 +306,7 @@
       return cells;
     }
 
-    function cardHTML(cells, label) {
+    function cardHTML(cells) {
       const headers = ['B', 'I', 'N', 'G', 'O'];
       let h = '<div class="bingo-card">';
       h += '<div class="bingo-header">';
@@ -336,7 +322,6 @@
         }
       }
       h += '</div>';
-      h += `<div class="bingo-card-label">${label}</div>`;
       h += '</div>';
       return h;
     }
@@ -365,9 +350,9 @@
       for (let i = 0; i < allCells.length; i += 2) {
         const page = document.createElement('div');
         page.className = 'page-wrapper';
-        page.innerHTML = cardHTML(allCells[i], `Card ${i + 1}  /  ${min}〜${max}`);
+        page.innerHTML = cardHTML(allCells[i]);
         if (allCells[i + 1]) {
-          page.innerHTML += cardHTML(allCells[i + 1], `Card ${i + 2}  /  ${min}〜${max}`);
+          page.innerHTML += cardHTML(allCells[i + 1]);
         }
         preview.appendChild(page);
       }
