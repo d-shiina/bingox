@@ -95,7 +95,6 @@
     .btn-print    { background: #1e88e5; color: white; }
 
     /* ===== SCREEN CARD LAYOUT ===== */
-    /* page-wrapper = visual grouping box on screen, A4 page on print */
     .page-wrapper {
       background: white;
       border-radius: 12px;
@@ -111,7 +110,6 @@
     }
 
     .bingo-card {
-      /* On screen: up to 2 per row, min 280px */
       width: clamp(280px, calc(50% - 12px), 420px);
       border: 3px solid #1a237e;
       border-radius: 4px;
@@ -158,82 +156,6 @@
       color: #f57f17;
       letter-spacing: 1px;
     }
-
-    /* ===== PRINT ===== */
-    @media print {
-      body {
-        background: none;
-        padding: 0;
-        margin: 0;
-      }
-
-      .screen-only { display: none !important; }
-
-      @page {
-        size: A4 landscape;
-        margin: 0;
-      }
-
-      /*
-       * 100vw/100vh はモバイルの画面サイズになるため、A4固定サイズを使う。
-       * iOS Safari は @page margin を無視しがちなので padding で余白を確保する。
-       */
-      .page-wrapper {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: nowrap;
-        align-items: stretch;
-        width: 297mm;
-        height: 210mm;
-        padding: 8mm 10mm;
-        gap: 5mm;
-        border-radius: 0;
-        box-shadow: none;
-        margin: 0;
-        overflow: hidden;
-        page-break-after: always;
-        break-after: page;
-      }
-      .page-wrapper:last-child {
-        page-break-after: avoid;
-        break-after: avoid;
-      }
-
-      /* 2枚均等幅 */
-      .bingo-card {
-        flex: 1;
-        min-width: 0;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-      }
-
-      .bingo-header {
-        flex-shrink: 0;
-      }
-
-      .bingo-header-cell {
-        font-size: 26pt;
-        padding: 2mm 0;
-      }
-
-      /* グリッドが残り高さをすべて使う */
-      .bingo-grid {
-        flex: 1;
-        min-height: 0;
-        grid-template-rows: repeat(5, 1fr);
-      }
-
-      .bingo-cell {
-        aspect-ratio: unset;
-        height: auto;
-        font-size: 44pt;
-      }
-
-      .bingo-cell.free-cell {
-        font-size: 22pt;
-      }
-    }
   </style>
 </head>
 <body>
@@ -269,13 +191,15 @@
 
     <div class="action-buttons">
       <button class="btn btn-generate" onclick="generateCards()">生成</button>
-      <button class="btn btn-print" id="printBtn" onclick="window.print()" style="display:none">印刷</button>
+      <button class="btn btn-print" id="printBtn" onclick="printCards()" style="display:none">印刷</button>
     </div>
   </div>
 
   <div id="cardsPreview"></div>
 
   <script>
+    let generatedCards = [];
+
     function shuffle(arr) {
       const a = [...arr];
       for (let i = a.length - 1; i > 0; i--) {
@@ -338,26 +262,153 @@
 
       const preview = document.getElementById('cardsPreview');
       preview.innerHTML = '';
+      generatedCards = [];
 
-      const allCells = [];
       for (let i = 0; i < count; i++) {
         const cells = generateCells(min, max, centerFree);
         if (!cells) return;
-        allCells.push(cells);
+        generatedCards.push(cells);
       }
 
-      for (let i = 0; i < allCells.length; i += 2) {
+      for (let i = 0; i < generatedCards.length; i += 2) {
         const page = document.createElement('div');
         page.className = 'page-wrapper';
-        page.innerHTML = cardHTML(allCells[i]);
-        if (allCells[i + 1]) {
-          page.innerHTML += cardHTML(allCells[i + 1]);
+        page.innerHTML = cardHTML(generatedCards[i]);
+        if (generatedCards[i + 1]) {
+          page.innerHTML += cardHTML(generatedCards[i + 1]);
         }
         preview.appendChild(page);
       }
 
       document.getElementById('printBtn').style.display = 'inline-block';
       document.getElementById('cardsPreview').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // ===== Canvas-based print =====
+
+    // A4横 at ~150dpi
+    const PW = 1748, PH = 1240;
+    const PAD = 60, GAP = 48;
+
+    function drawCard(ctx, cells, x, y, w, h) {
+      const HEADER_H = Math.round(h * 0.12);
+      const gridH = h - HEADER_H;
+      const cellW = w / 5;
+      const cellH = gridH / 5;
+
+      // カード背景
+      ctx.fillStyle = 'white';
+      ctx.fillRect(x, y, w, h);
+
+      // ヘッダー背景
+      ctx.fillStyle = '#1a237e';
+      ctx.fillRect(x, y, w, HEADER_H);
+
+      // ヘッダー文字
+      const headers = ['B', 'I', 'N', 'G', 'O'];
+      ctx.fillStyle = 'white';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const headerFontSize = Math.round(HEADER_H * 0.72);
+      ctx.font = `900 ${headerFontSize}px Arial, sans-serif`;
+      for (let i = 0; i < 5; i++) {
+        ctx.fillText(headers[i], x + cellW * i + cellW / 2, y + HEADER_H / 2);
+      }
+
+      // セル
+      for (let row = 0; row < 5; row++) {
+        for (let col = 0; col < 5; col++) {
+          const idx = row * 5 + col;
+          const cx = x + cellW * col;
+          const cy = y + HEADER_H + cellH * row;
+          const val = cells[idx];
+
+          if (val === null) {
+            // FREE
+            ctx.fillStyle = '#fff9c4';
+            ctx.fillRect(cx, cy, cellW, cellH);
+            ctx.fillStyle = '#f57f17';
+            ctx.font = `900 ${Math.round(cellH * 0.38)}px Arial, sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('FREE', cx + cellW / 2, cy + cellH / 2);
+          } else {
+            ctx.fillStyle = 'white';
+            ctx.fillRect(cx, cy, cellW, cellH);
+            ctx.fillStyle = '#1a237e';
+            const text = String(val);
+            // 数字をセル幅に合わせて最大化
+            let fontSize = Math.round(cellH * 0.85);
+            ctx.font = `800 ${fontSize}px Arial, sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            while (ctx.measureText(text).width > cellW * 0.86 && fontSize > 20) {
+              fontSize -= 2;
+              ctx.font = `800 ${fontSize}px Arial, sans-serif`;
+            }
+            ctx.fillText(text, cx + cellW / 2, cy + cellH / 2);
+          }
+
+          // セル枠線
+          ctx.strokeStyle = '#9fa8da';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(cx, cy, cellW, cellH);
+        }
+      }
+
+      // カード枠線
+      ctx.strokeStyle = '#1a237e';
+      ctx.lineWidth = 6;
+      ctx.strokeRect(x, y, w, h);
+    }
+
+    function printCards() {
+      if (generatedCards.length === 0) return;
+
+      const cardW = Math.round((PW - PAD * 2 - GAP) / 2);
+      const cardH = PH - PAD * 2;
+      const dataURLs = [];
+
+      for (let i = 0; i < generatedCards.length; i += 2) {
+        const canvas = document.createElement('canvas');
+        canvas.width = PW;
+        canvas.height = PH;
+        const ctx = canvas.getContext('2d');
+
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, PW, PH);
+
+        drawCard(ctx, generatedCards[i], PAD, PAD, cardW, cardH);
+        if (generatedCards[i + 1]) {
+          drawCard(ctx, generatedCards[i + 1], PAD + cardW + GAP, PAD, cardW, cardH);
+        }
+
+        dataURLs.push(canvas.toDataURL('image/png'));
+      }
+
+      const imgTags = dataURLs.map(url =>
+        `<img src="${url}" style="width:297mm;height:210mm;display:block;page-break-after:always;break-after:page;">`
+      ).join('\n');
+
+      const html = `<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: white; }
+  img:last-child { page-break-after: avoid; break-after: avoid; }
+</style></head>
+<body>
+${imgTags}
+<script>window.onload = function(){ setTimeout(function(){ window.print(); }, 400); }<\/script>
+</body></html>`;
+
+      const win = window.open('', '_blank');
+      if (win) {
+        win.document.write(html);
+        win.document.close();
+      } else {
+        alert('ポップアップがブロックされました。ブラウザの設定でポップアップを許可してください。');
+      }
     }
   </script>
 
