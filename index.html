@@ -121,7 +121,7 @@
           <label>中央マス</label>
           <select id="centerType">
             <option value="free">FREE</option>
-            <option value="number">数字</option>
+            <option value="number" selected>数字</option>
           </select>
         </div>
       </div>
@@ -275,6 +275,34 @@
     // ===== Canvas → PDF =====
     const PW = 1748, PH = 1240;
 
+    function drawDecoration(ctx, x, y, w, h) {
+      const M = 18;  // カードからの距離
+      const L = 36;  // コーナーブラケットの長さ
+      const ox = x - M, oy = y - M, ow = w + M * 2, oh = h + M * 2;
+
+      ctx.save();
+      ctx.strokeStyle = '#1E293B';
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'square';
+
+      // 四隅のLブラケット
+      const corners = [
+        { cx: ox,      cy: oy,      dx:  1, dy:  1 },
+        { cx: ox + ow, cy: oy,      dx: -1, dy:  1 },
+        { cx: ox,      cy: oy + oh, dx:  1, dy: -1 },
+        { cx: ox + ow, cy: oy + oh, dx: -1, dy: -1 },
+      ];
+      for (const { cx, cy, dx, dy } of corners) {
+        ctx.beginPath();
+        ctx.moveTo(cx + dx * L, cy);
+        ctx.lineTo(cx, cy);
+        ctx.lineTo(cx, cy + dy * L);
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    }
+
     function drawCard(ctx, cells, x, y, w, h) {
       const cellW = w / 5, cellH = cellW;
       const HEADER_H = h - cellH * 5;
@@ -359,8 +387,10 @@
         const ctx = canvas.getContext('2d');
         ctx.fillStyle = 'white';
         ctx.fillRect(0, 0, PW, PH);
+        drawDecoration(ctx, HPAD, cardY, cardW, cardH);
         drawCard(ctx, generatedCards[i], HPAD, cardY, cardW, cardH);
         if (generatedCards[i + 1]) {
+          drawDecoration(ctx, HPAD + cardW + GAP, cardY, cardW, cardH);
           drawCard(ctx, generatedCards[i + 1], HPAD + cardW + GAP, cardY, cardW, cardH);
           const cutX = Math.round(HPAD + cardW + GAP / 2);
           ctx.save();
