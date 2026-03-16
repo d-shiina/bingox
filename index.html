@@ -73,16 +73,8 @@
       font-weight: 500; color: #BF360C;
     }
 
-    /* Slider */
-    .slider-clip { overflow: hidden; border-radius: 10px; }
-    .slider-track {
-      display: flex;
-      transition: transform .28s cubic-bezier(.4,0,.2,1);
-      will-change: transform;
-    }
-    .slider-clip { position: relative; }
-    .slider-slide {
-      flex-shrink: 0;
+    /* Card viewer */
+    .card-view {
       display: flex; justify-content: center; align-items: center;
       padding: 16px 0;
     }
@@ -165,11 +157,9 @@
                 class="w-10 h-10 rounded-lg flex items-center justify-center text-white text-xl font-bold disabled:opacity-30"
                 style="background:#334155; touch-action:manipulation;" disabled>›</button>
             </div>
-            <!-- Clip + track -->
-            <div class="slider-clip">
-              <div id="sliderTrack" class="slider-track"
-                ontouchstart="touchStart(event)" ontouchend="touchEnd(event)">
-              </div>
+            <!-- Card display -->
+            <div id="cardDisplay"
+              ontouchstart="touchStart(event)" ontouchend="touchEnd(event)">
             </div>
           </div>
 
@@ -188,33 +178,19 @@
     let generatedCards = [];
     let currentSlide = 0;
     let touchStartX = null;
-    let slideWidth = 0;
 
-    // ── Slider ───────────────────────────────────────────
-
-    function updateSlideWidths() {
-      const clip = document.querySelector('.slider-clip');
-      slideWidth = clip.clientWidth;
-      document.querySelectorAll('.slider-slide').forEach(s => {
-        s.style.width = slideWidth + 'px';
-      });
-      slideTo(currentSlide);
-    }
+    // ── Card viewer ───────────────────────────────────────
 
     function slideTo(idx) {
       const total = generatedCards.length;
       currentSlide = Math.max(0, Math.min(idx, total - 1));
-      document.getElementById('sliderTrack').style.transform =
-        `translateX(-${currentSlide * slideWidth}px)`;
+      const views = document.querySelectorAll('.card-view');
+      views.forEach((v, i) => { v.style.display = i === currentSlide ? '' : 'none'; });
       document.getElementById('slideCounter').textContent =
         `${currentSlide + 1} / ${total}`;
       document.getElementById('prevBtn').disabled = currentSlide === 0;
       document.getElementById('nextBtn').disabled = currentSlide === total - 1;
     }
-
-    window.addEventListener('resize', () => {
-      if (generatedCards.length) updateSlideWidths();
-    });
 
     function touchStart(e) { touchStartX = e.touches[0].clientX; }
     function touchEnd(e) {
@@ -284,18 +260,14 @@
       document.getElementById('emptyState').style.display = 'none';
       document.getElementById('sliderSection').style.display = '';
 
-      // Measure clip width after section is visible
-      const clip = document.querySelector('.slider-clip');
-      slideWidth = clip.clientWidth;
-
-      const track = document.getElementById('sliderTrack');
-      track.innerHTML = '';
+      const display = document.getElementById('cardDisplay');
+      display.innerHTML = '';
       generatedCards.forEach(cells => {
-        const slide = document.createElement('div');
-        slide.className = 'slider-slide';
-        slide.style.width = slideWidth + 'px';
-        slide.innerHTML = cardHTML(cells);
-        track.appendChild(slide);
+        const view = document.createElement('div');
+        view.className = 'card-view';
+        view.style.display = 'none';
+        view.innerHTML = cardHTML(cells);
+        display.appendChild(view);
       });
 
       slideTo(0);
