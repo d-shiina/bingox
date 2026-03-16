@@ -80,8 +80,9 @@
       transition: transform .28s cubic-bezier(.4,0,.2,1);
       will-change: transform;
     }
+    .slider-clip { position: relative; }
     .slider-slide {
-      flex: 0 0 100%;
+      flex-shrink: 0;
       display: flex; justify-content: center; align-items: center;
       padding: 16px 0;
     }
@@ -153,7 +154,7 @@
 
         <!-- Slider section -->
         <div id="sliderSection" style="display:none;" class="flex flex-col gap-4">
-          <div class="bg-white rounded-2xl p-4" style="box-shadow:0 1px 3px rgba(0,0,0,.07),0 4px 12px rgba(0,0,0,.05); min-width:0; overflow:hidden;">
+          <div class="bg-white rounded-2xl p-4" style="box-shadow:0 1px 3px rgba(0,0,0,.07),0 4px 12px rgba(0,0,0,.05);">
             <!-- Nav -->
             <div class="flex items-center justify-between mb-3 px-1">
               <button id="prevBtn" onclick="slideTo(currentSlide - 1)"
@@ -187,19 +188,33 @@
     let generatedCards = [];
     let currentSlide = 0;
     let touchStartX = null;
+    let slideWidth = 0;
 
     // ── Slider ───────────────────────────────────────────
+
+    function updateSlideWidths() {
+      const clip = document.querySelector('.slider-clip');
+      slideWidth = clip.clientWidth;
+      document.querySelectorAll('.slider-slide').forEach(s => {
+        s.style.width = slideWidth + 'px';
+      });
+      slideTo(currentSlide);
+    }
 
     function slideTo(idx) {
       const total = generatedCards.length;
       currentSlide = Math.max(0, Math.min(idx, total - 1));
       document.getElementById('sliderTrack').style.transform =
-        `translateX(-${currentSlide * 100}%)`;
+        `translateX(-${currentSlide * slideWidth}px)`;
       document.getElementById('slideCounter').textContent =
         `${currentSlide + 1} / ${total}`;
       document.getElementById('prevBtn').disabled = currentSlide === 0;
       document.getElementById('nextBtn').disabled = currentSlide === total - 1;
     }
+
+    window.addEventListener('resize', () => {
+      if (generatedCards.length) updateSlideWidths();
+    });
 
     function touchStart(e) { touchStartX = e.touches[0].clientX; }
     function touchEnd(e) {
@@ -266,17 +281,23 @@
         generatedCards.push(card);
       }
 
+      document.getElementById('emptyState').style.display = 'none';
+      document.getElementById('sliderSection').style.display = '';
+
+      // Measure clip width after section is visible
+      const clip = document.querySelector('.slider-clip');
+      slideWidth = clip.clientWidth;
+
       const track = document.getElementById('sliderTrack');
       track.innerHTML = '';
       generatedCards.forEach(cells => {
         const slide = document.createElement('div');
         slide.className = 'slider-slide';
+        slide.style.width = slideWidth + 'px';
         slide.innerHTML = cardHTML(cells);
         track.appendChild(slide);
       });
 
-      document.getElementById('emptyState').style.display = 'none';
-      document.getElementById('sliderSection').style.display = '';
       slideTo(0);
     }
 
