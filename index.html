@@ -4,198 +4,124 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ビンゴカード生成</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* ===== BASE ===== */
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
-      background: #e8eaf6;
-      padding: 24px;
-      color: #222;
-    }
-
-    /* ===== UI PANEL ===== */
-    .screen-only h1 {
-      text-align: center;
-      font-size: 30px;
-      font-weight: 900;
-      margin-bottom: 24px;
-      color: #1a237e;
-      letter-spacing: 2px;
-    }
-
-    .settings-panel {
-      background: white;
-      border-radius: 16px;
-      padding: 24px;
-      max-width: 560px;
-      margin: 0 auto 20px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-    }
-
-    .setting-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 16px;
-    }
-    .setting-row:last-child { margin-bottom: 0; }
-
-    .setting-item {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .setting-item label {
-      font-size: 12px;
-      font-weight: 700;
-      color: #666;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .setting-item input,
-    .setting-item select {
-      padding: 10px 12px;
-      border: 2px solid #ddd;
-      border-radius: 8px;
-      font-size: 17px;
-      font-weight: 600;
-      transition: border-color 0.2s;
-    }
-    .setting-item input:focus,
-    .setting-item select:focus {
-      outline: none;
-      border-color: #3f51b5;
-    }
-
-    .action-buttons {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      max-width: 560px;
-      margin: 0 auto 32px;
-    }
-
-    .btn {
-      padding: 13px 34px;
-      font-size: 17px;
-      font-weight: 800;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: transform 0.1s, box-shadow 0.1s;
-      letter-spacing: 1px;
-    }
-    .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.2); }
-    .btn:active { transform: translateY(0); }
-    .btn-generate { background: #43a047; color: white; }
-    .btn-print    { background: #1e88e5; color: white; }
-
-    /* ===== SCREEN CARD LAYOUT ===== */
-    .page-wrapper {
-      background: white;
-      border-radius: 12px;
-      padding: 24px;
-      max-width: 900px;
-      margin: 0 auto 24px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.13);
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      justify-content: center;
-      align-items: flex-start;
-    }
-
+    /* ===== SCREEN CARD LAYOUT (Tailwindで代替できない部分のみ) ===== */
     .bingo-card {
-      width: clamp(280px, calc(50% - 12px), 420px);
+      width: clamp(260px, calc(50% - 12px), 400px);
       border: 3px solid #1a237e;
-      border-radius: 4px;
+      border-radius: 6px;
       overflow: hidden;
+      box-shadow: 0 4px 16px rgba(26,35,126,0.15);
     }
-
     .bingo-header {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       background: #1a237e;
     }
-
     .bingo-header-cell {
       color: white;
-      font-size: clamp(24px, 5vw, 48px);
+      font-size: clamp(22px, 4.5vw, 44px);
       font-weight: 900;
       text-align: center;
       padding: 4% 0;
-      border-right: 1px solid rgba(255,255,255,0.2);
+      border-right: 1px solid rgba(255,255,255,0.15);
     }
     .bingo-header-cell:last-child { border-right: none; }
-
     .bingo-grid {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
     }
-
     .bingo-cell {
       aspect-ratio: 1;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: clamp(28px, 6.5vw, 70px);
+      font-size: clamp(24px, 5.5vw, 60px);
       font-weight: 800;
       border: 1px solid #9fa8da;
       color: #1a237e;
       background: white;
     }
-
     .bingo-cell.free-cell {
       background: #fff9c4;
-      font-size: clamp(15px, 3.2vw, 34px);
+      font-size: clamp(13px, 2.8vw, 30px);
       font-weight: 900;
       color: #f57f17;
       letter-spacing: 1px;
     }
   </style>
 </head>
-<body>
+<body class="min-h-screen bg-gradient-to-br from-indigo-950 via-indigo-900 to-slate-900 text-white">
 
-  <div class="screen-only">
-    <h1>ビンゴカード生成</h1>
+  <!-- Hero header -->
+  <div class="text-center pt-12 pb-8 px-4">
+    <div class="text-5xl mb-3">🎯</div>
+    <h1 class="text-4xl font-black tracking-widest text-white drop-shadow-lg">ビンゴカード生成</h1>
+    <p class="text-indigo-300 mt-2 text-sm tracking-wide">A4横・2枚組 PDF出力対応</p>
+  </div>
 
-    <div class="settings-panel">
-      <div class="setting-row">
-        <div class="setting-item">
-          <label>数字の最小値</label>
-          <input type="number" id="numMin" value="1" min="1" max="999">
+  <!-- Settings card -->
+  <div class="max-w-md mx-auto px-4 pb-6">
+    <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 shadow-2xl">
+
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-indigo-200 uppercase tracking-widest">最小値</label>
+          <input type="number" id="numMin" value="1" min="1" max="999"
+            class="bg-white/15 border border-white/30 rounded-xl px-4 py-3 text-white text-lg font-bold
+                   focus:outline-none focus:border-indigo-300 focus:bg-white/20 transition text-center
+                   [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
         </div>
-        <div class="setting-item">
-          <label>数字の最大値</label>
-          <input type="number" id="numMax" value="75" min="1" max="999">
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-indigo-200 uppercase tracking-widest">最大値</label>
+          <input type="number" id="numMax" value="75" min="1" max="999"
+            class="bg-white/15 border border-white/30 rounded-xl px-4 py-3 text-white text-lg font-bold
+                   focus:outline-none focus:border-indigo-300 focus:bg-white/20 transition text-center
+                   [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
         </div>
       </div>
-      <div class="setting-row">
-        <div class="setting-item">
-          <label>生成枚数</label>
-          <input type="number" id="numCards" value="2" min="1" max="100">
+
+      <div class="grid grid-cols-2 gap-4 mb-6">
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-indigo-200 uppercase tracking-widest">生成枚数</label>
+          <input type="number" id="numCards" value="2" min="1" max="100"
+            class="bg-white/15 border border-white/30 rounded-xl px-4 py-3 text-white text-lg font-bold
+                   focus:outline-none focus:border-indigo-300 focus:bg-white/20 transition text-center
+                   [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
         </div>
-        <div class="setting-item">
-          <label>真ん中のマス</label>
-          <select id="centerType">
-            <option value="free">FREE（穴あき）</option>
-            <option value="number">数字</option>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-indigo-200 uppercase tracking-widest">中央マス</label>
+          <select id="centerType"
+            class="bg-white/15 border border-white/30 rounded-xl px-4 py-3 text-white text-base font-bold
+                   focus:outline-none focus:border-indigo-300 focus:bg-white/20 transition cursor-pointer">
+            <option value="free" class="text-gray-900">FREE（穴あき）</option>
+            <option value="number" class="text-gray-900">数字</option>
           </select>
         </div>
       </div>
-    </div>
 
-    <div class="action-buttons">
-      <button class="btn btn-generate" onclick="generateCards()">生成</button>
-      <button class="btn btn-print" id="printBtn" onclick="printCards()" style="display:none">印刷</button>
+      <!-- Buttons -->
+      <div class="flex gap-3">
+        <button onclick="generateCards()"
+          class="flex-1 bg-gradient-to-r from-emerald-500 to-green-400 hover:from-emerald-400 hover:to-green-300
+                 text-white font-black text-lg py-3.5 rounded-xl shadow-lg shadow-emerald-900/40
+                 active:scale-95 transition-all duration-150 tracking-wide">
+          ✦ 生成
+        </button>
+        <button id="printBtn" onclick="printCards()" style="display:none"
+          class="flex-1 bg-gradient-to-r from-sky-500 to-blue-400 hover:from-sky-400 hover:to-blue-300
+                 text-white font-black text-lg py-3.5 rounded-xl shadow-lg shadow-blue-900/40
+                 active:scale-95 transition-all duration-150 tracking-wide">
+          ↓ PDF
+        </button>
+      </div>
+
     </div>
   </div>
 
-  <div id="cardsPreview"></div>
+  <!-- Card preview -->
+  <div id="cardsPreview" class="px-4 pb-16"></div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
@@ -245,8 +171,7 @@
           h += `<div class="bingo-cell">${val}</div>`;
         }
       }
-      h += '</div>';
-      h += '</div>';
+      h += '</div></div>';
       return h;
     }
 
@@ -273,49 +198,39 @@
 
       for (let i = 0; i < generatedCards.length; i += 2) {
         const page = document.createElement('div');
-        page.className = 'page-wrapper';
+        page.className = 'max-w-3xl mx-auto mb-6 bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-wrap gap-5 justify-center';
         page.innerHTML = cardHTML(generatedCards[i]);
-        if (generatedCards[i + 1]) {
-          page.innerHTML += cardHTML(generatedCards[i + 1]);
-        }
+        if (generatedCards[i + 1]) page.innerHTML += cardHTML(generatedCards[i + 1]);
         preview.appendChild(page);
       }
 
-      document.getElementById('printBtn').style.display = 'inline-block';
+      document.getElementById('printBtn').style.display = '';
       document.getElementById('cardsPreview').scrollIntoView({ behavior: 'smooth' });
     }
 
-    // ===== Canvas-based print =====
-
-    // A4横 at ~150dpi
-    const PW = 1748, PH = 1240;
-    const PAD = 60, GAP = 48;
+    // ===== Canvas → PDF print =====
+    const PW = 1748, PH = 1240, PAD = 60, GAP = 48;
 
     function drawCard(ctx, cells, x, y, w, h) {
       const cellW = w / 5;
-      const cellH = cellW; // 正方形セル
-      const HEADER_H = h - cellH * 5; // 残りをヘッダーに
+      const cellH = cellW;
+      const HEADER_H = h - cellH * 5;
 
-      // カード背景
       ctx.fillStyle = 'white';
       ctx.fillRect(x, y, w, h);
 
-      // ヘッダー背景
       ctx.fillStyle = '#1a237e';
       ctx.fillRect(x, y, w, HEADER_H);
 
-      // ヘッダー文字
       const headers = ['B', 'I', 'N', 'G', 'O'];
       ctx.fillStyle = 'white';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      const headerFontSize = Math.round(HEADER_H * 0.72);
-      ctx.font = `900 ${headerFontSize}px Arial, sans-serif`;
+      ctx.font = `900 ${Math.round(HEADER_H * 0.72)}px Arial, sans-serif`;
       for (let i = 0; i < 5; i++) {
         ctx.fillText(headers[i], x + cellW * i + cellW / 2, y + HEADER_H / 2);
       }
 
-      // セル
       for (let row = 0; row < 5; row++) {
         for (let col = 0; col < 5; col++) {
           const idx = row * 5 + col;
@@ -324,7 +239,6 @@
           const val = cells[idx];
 
           if (val === null) {
-            // FREE
             ctx.fillStyle = '#fff9c4';
             ctx.fillRect(cx, cy, cellW, cellH);
             ctx.fillStyle = '#f57f17';
@@ -337,7 +251,6 @@
             ctx.fillRect(cx, cy, cellW, cellH);
             ctx.fillStyle = '#1a237e';
             const text = String(val);
-            // 数字をセル幅に合わせて最大化
             let fontSize = Math.round(cellH * 0.85);
             ctx.font = `800 ${fontSize}px Arial, sans-serif`;
             ctx.textAlign = 'center';
@@ -349,14 +262,12 @@
             ctx.fillText(text, cx + cellW / 2, cy + cellH / 2);
           }
 
-          // セル枠線
           ctx.strokeStyle = '#9fa8da';
           ctx.lineWidth = 2;
           ctx.strokeRect(cx, cy, cellW, cellH);
         }
       }
 
-      // カード枠線
       ctx.strokeStyle = '#1a237e';
       ctx.lineWidth = 6;
       ctx.strokeRect(x, y, w, h);
@@ -365,12 +276,10 @@
     function printCards() {
       if (generatedCards.length === 0) return;
 
-      // cellWを決めてcardHを逆算し正方形セルにする
       const cardW = Math.round((PW - PAD * 2 - GAP) / 2);
       const cellW = cardW / 5;
-      const headerH = Math.round(cellW * 0.8); // BINGOヘッダー高さ
+      const headerH = Math.round(cellW * 0.8);
       const cardH = headerH + Math.round(cellW * 5);
-      // 縦方向センタリング
       const cardY = PAD + Math.round((PH - PAD * 2 - cardH) / 2);
       const dataURLs = [];
 
@@ -379,28 +288,22 @@
         canvas.width = PW;
         canvas.height = PH;
         const ctx = canvas.getContext('2d');
-
         ctx.fillStyle = 'white';
         ctx.fillRect(0, 0, PW, PH);
-
         drawCard(ctx, generatedCards[i], PAD, cardY, cardW, cardH);
         if (generatedCards[i + 1]) {
           drawCard(ctx, generatedCards[i + 1], PAD + cardW + GAP, cardY, cardW, cardH);
         }
-
         dataURLs.push(canvas.toDataURL('image/png'));
       }
 
-      // jsPDFでA4横PDFを生成
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-
       for (let i = 0; i < dataURLs.length; i++) {
         if (i > 0) doc.addPage();
         doc.addImage(dataURLs[i], 'PNG', 0, 0, 297, 210);
       }
 
-      // iOSはblobURLでPDFを開ける
       const blob = doc.output('blob');
       const url = URL.createObjectURL(blob);
       window.open(url, '_blank');
