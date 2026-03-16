@@ -146,15 +146,15 @@
     <div class="flex items-center justify-between mb-3">
       <button id="prevBtn" onclick="slidePrev()"
         class="w-10 h-10 rounded-lg flex items-center justify-center text-white text-lg font-bold disabled:opacity-30"
-        style="background:#334155;" disabled>‹</button>
+        style="background:#334155; touch-action:manipulation;" disabled>‹</button>
       <span id="slideCounter" class="text-sm font-medium" style="color:#475569;">1 / 1</span>
       <button id="nextBtn" onclick="slideNext()"
         class="w-10 h-10 rounded-lg flex items-center justify-center text-white text-lg font-bold disabled:opacity-30"
-        style="background:#334155;" disabled>›</button>
+        style="background:#334155; touch-action:manipulation;" disabled>›</button>
     </div>
     <div id="sliderTrack"
-      class="flex overflow-x-hidden"
-      style="scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;">
+      class="flex"
+      style="overflow-x:scroll; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; scrollbar-width:none;">
     </div>
   </section>
 
@@ -250,6 +250,17 @@
       document.getElementById('prevBtn').disabled = true;
       document.getElementById('nextBtn').disabled = totalSlides <= 1;
 
+      // スクロールでページカウンター同期
+      track.onscroll = () => {
+        const idx = Math.round(track.scrollLeft / track.clientWidth);
+        if (idx !== currentSlide) {
+          currentSlide = idx;
+          document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+          document.getElementById('prevBtn').disabled = currentSlide === 0;
+          document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+      };
+
       document.getElementById('printBtn').style.display = '';
       document.getElementById('sliderSection').style.display = '';
       document.getElementById('sliderSection').scrollIntoView({ behavior: 'smooth' });
@@ -315,47 +326,6 @@
       ctx.strokeRect(x, y, w, h);
     }
 
-    // ハサミアイコン（下向き、canvasパス描画）
-    function drawScissors(ctx, cx, cy, size, color) {
-      ctx.save();
-      ctx.translate(cx, cy);
-      ctx.strokeStyle = color;
-      ctx.fillStyle = color;
-      ctx.lineWidth = size * 0.06;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-
-      const hw = size * 0.26;  // ハンドル間の半幅
-      const hr = size * 0.18;  // ハンドルリング半径
-      const hy = -size * 0.38; // ハンドル中心Y（上）
-      const ty =  size * 0.42; // 刃先Y（下）
-      const py =  size * 0.05; // 交差点Y
-
-      // 左ハンドル（円）
-      ctx.beginPath();
-      ctx.arc(-hw, hy, hr, 0, Math.PI * 2);
-      ctx.stroke();
-
-      // 右ハンドル（円）
-      ctx.beginPath();
-      ctx.arc(hw, hy, hr, 0, Math.PI * 2);
-      ctx.stroke();
-
-      // 左ブレード：左ハンドル → 交差点 → 右下の刃先
-      ctx.beginPath();
-      ctx.moveTo(-hw, hy + hr);
-      ctx.lineTo(hw * 0.25, ty);
-      ctx.stroke();
-
-      // 右ブレード：右ハンドル → 交差点 → 左下の刃先
-      ctx.beginPath();
-      ctx.moveTo(hw, hy + hr);
-      ctx.lineTo(-hw * 0.25, ty);
-      ctx.stroke();
-
-      ctx.restore();
-    }
-
     function printCards() {
       if (!generatedCards.length) return;
 
@@ -376,28 +346,15 @@
         if (generatedCards[i + 1]) {
           drawCard(ctx, generatedCards[i + 1], PAD + cardW + GAP, cardY, cardW, cardH);
           const cutX = Math.round(PAD + cardW + GAP / 2);
-          const SC = 88; // ハサミアイコンサイズ
-
-          // 破線（細め・均等）
           ctx.save();
           ctx.strokeStyle = '#444';
           ctx.lineWidth = 2;
           ctx.setLineDash([14, 9]);
           ctx.beginPath();
-          ctx.moveTo(cutX, SC * 1.05);
-          ctx.lineTo(cutX, PH - SC * 1.05);
+          ctx.moveTo(cutX, 0);
+          ctx.lineTo(cutX, PH);
           ctx.stroke();
           ctx.setLineDash([]);
-          ctx.restore();
-
-          // ハサミ（上：下向き）
-          drawScissors(ctx, cutX, SC * 0.5, SC, '#444');
-
-          // ハサミ（下：上向き = 180°回転）
-          ctx.save();
-          ctx.translate(cutX, PH - SC * 0.5);
-          ctx.rotate(Math.PI);
-          drawScissors(ctx, 0, 0, SC, '#444');
           ctx.restore();
         }
         dataURLs.push(canvas.toDataURL('image/png'));
