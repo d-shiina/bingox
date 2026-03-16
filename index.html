@@ -126,7 +126,7 @@
 
     .bingo-header-cell {
       color: white;
-      font-size: clamp(20px, 4vw, 38px);
+      font-size: clamp(24px, 5vw, 48px);
       font-weight: 900;
       text-align: center;
       padding: 4% 0;
@@ -144,7 +144,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: clamp(16px, 3.5vw, 34px);
+      font-size: clamp(22px, 5vw, 52px);
       font-weight: 800;
       border: 1px solid #9fa8da;
       color: #1a237e;
@@ -153,7 +153,7 @@
 
     .bingo-cell.free-cell {
       background: #fff9c4;
-      font-size: clamp(11px, 2.2vw, 22px);
+      font-size: clamp(13px, 2.8vw, 28px);
       font-weight: 900;
       color: #f57f17;
       letter-spacing: 1px;
@@ -177,17 +177,17 @@
 
       .screen-only { display: none !important; }
 
-      /* Each page-wrapper = one A4 page */
+      /* Each page-wrapper = one A4 landscape page, 2 cards side by side */
       .page-wrapper {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         flex-wrap: nowrap;
-        justify-content: space-evenly;
+        justify-content: center;
         align-items: center;
-        width: 210mm;
-        min-height: 297mm;
-        padding: 10mm 12mm;
-        gap: 4mm;
+        width: 297mm;
+        min-height: 210mm;
+        padding: 8mm 10mm;
+        gap: 6mm;
         border-radius: 0;
         box-shadow: none;
         margin: 0;
@@ -199,31 +199,33 @@
         break-after: avoid;
       }
 
+      /* A4 landscape: 297mm wide, 2 cards → each ~135mm */
       .bingo-card {
-        width: 182mm;
+        width: 135mm;
+        flex-shrink: 0;
       }
 
       .bingo-header-cell {
-        font-size: 30pt;
-        padding: 5mm 0;
+        font-size: 24pt;
+        padding: 4mm 0;
       }
 
       .bingo-cell {
         aspect-ratio: unset;
-        height: 23mm;
-        font-size: 26pt;
+        height: 30mm;
+        font-size: 28pt;
       }
 
       .bingo-cell.free-cell {
-        font-size: 15pt;
+        font-size: 16pt;
       }
 
       .bingo-card-label {
-        font-size: 8pt;
+        font-size: 7pt;
       }
 
       @page {
-        size: A4 portrait;
+        size: A4 landscape;
         margin: 0;
       }
     }
@@ -248,14 +250,7 @@
       <div class="setting-row">
         <div class="setting-item">
           <label>生成枚数</label>
-          <select id="numCards">
-            <option value="1">1枚</option>
-            <option value="2" selected>2枚</option>
-            <option value="4">4枚</option>
-            <option value="6">6枚</option>
-            <option value="8">8枚</option>
-            <option value="10">10枚</option>
-          </select>
+          <input type="number" id="numCards" value="2" min="1" max="100">
         </div>
         <div class="setting-item">
           <label>真ん中のマス</label>
