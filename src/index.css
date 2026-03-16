@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background: #F1F5F9;
+}
+
+h1, button {
+  font-family: 'Google Sans', 'Roboto', sans-serif;
+}
+
+/* MD3 Filled Text Field */
+.m3-field {
+  position: relative;
+}
+.m3-field input,
+.m3-field select {
+  width: 100%;
+  background: #F1F5F9;
+  border: none;
+  border-bottom: 1px solid #94A3B8;
+  border-radius: 4px 4px 0 0;
+  padding: 22px 16px 6px;
+  font-size: 16px;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  color: #1D1B20;
+  outline: none;
+  transition: border-color .2s, background .2s;
+  appearance: none;
+}
+.m3-field input:focus,
+.m3-field select:focus {
+  background: #E2E8F0;
+  border-bottom: 2px solid #334155;
+}
+.m3-field label {
+  position: absolute;
+  top: 7px; left: 16px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .5px;
+  color: #334155;
+  pointer-events: none;
+  text-transform: uppercase;
+}
+
+/* Bingo card */
+.bingo-card {
+  width: clamp(240px, 75%, 400px);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(30,41,59,.18);
+}
+.bingo-header {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  background: #1E293B;
+}
+.bingo-header-cell {
+  color: white;
+  font-size: clamp(18px, 3.5vw, 40px);
+  font-weight: 700;
+  text-align: center;
+  padding: 4% 0;
+  border-right: 1px solid rgba(255,255,255,.1);
+  font-family: 'Google Sans', sans-serif;
+}
+.bingo-header-cell:last-child { border-right: none; }
+.bingo-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+}
+.bingo-cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(20px, 4vw, 52px);
+  font-weight: 700;
+  border: 1px solid #CBD5E1;
+  color: #0F172A;
+  background: white;
+  font-family: 'Google Sans', sans-serif;
+}
+.bingo-cell.free-cell {
+  background: #FFF3E0;
+  font-size: clamp(11px, 2vw, 24px);
+  font-weight: 500;
+  color: #BF360C;
+}
+
+/* Spinner */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.spin {
+  animation: spin .8s linear infinite;
+  display: inline-block;
+  transform-origin: center;
+}
