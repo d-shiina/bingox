@@ -57,6 +57,8 @@
     }
     .m3-btn:hover   { filter: brightness(0.94); }
     .m3-btn:active  { filter: brightness(0.88); box-shadow: none !important; }
+    .m3-btn:disabled { opacity: .7; cursor: default; filter: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     /* Bingo card */
     .bingo-card {
@@ -331,7 +333,13 @@
     function printCards() {
       if (!generatedCards.length) return;
 
-      const cardW = Math.round((PW - PAD * 2 - GAP) / 2);
+      const btn = document.getElementById('printBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span style="display:inline-flex;align-items:center;gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" style="transform-origin:center;animation:spin .8s linear infinite"/></svg>作成中…</span>';
+
+      // UIの再描画を待ってから重い処理を実行
+      setTimeout(() => {
+        const cardW = Math.round((PW - PAD * 2 - GAP) / 2);
       const cellW = cardW / 5;
       const headerH = Math.round(cellW * 0.8);
       const cardH = headerH + Math.round(cellW * 5);
@@ -369,8 +377,12 @@
         doc.addImage(dataURLs[i], 'PNG', 0, 0, 297, 210);
       }
 
-      const url = URL.createObjectURL(doc.output('blob'));
-      window.open(url, '_blank');
+        const url = URL.createObjectURL(doc.output('blob'));
+        window.open(url, '_blank');
+
+        btn.disabled = false;
+        btn.innerHTML = 'PDF 出力';
+      }, 50);
     }
   </script>
 
