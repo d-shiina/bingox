@@ -189,8 +189,9 @@
 
     function slideTo(idx) {
       const track = document.getElementById('sliderTrack');
+      const slideW = track.querySelector('div') ? track.querySelector('div').offsetWidth : track.clientWidth;
       currentSlide = Math.max(0, Math.min(idx, totalSlides - 1));
-      track.scrollTo({ left: currentSlide * track.clientWidth, behavior: 'smooth' });
+      track.scrollTo({ left: currentSlide * slideW, behavior: 'smooth' });
       document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
       document.getElementById('prevBtn').disabled = currentSlide === 0;
       document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
@@ -255,15 +256,20 @@
         generatedCards.push(cells);
       }
 
+      // セクションを先に表示してから clientWidth を取得
+      document.getElementById('emptyState').style.display = 'none';
+      document.getElementById('sliderSection').style.display = '';
+
       const track = document.getElementById('sliderTrack');
+      const slideW = track.clientWidth; // display後にアクセス → 正しい幅を取得
       track.innerHTML = '';
       track.scrollLeft = 0;
       totalSlides = 0;
 
       for (let i = 0; i < generatedCards.length; i++) {
         const slide = document.createElement('div');
-        slide.className = 'flex justify-center items-start flex-shrink-0 w-full py-2';
-        slide.style.cssText = 'scroll-snap-align:start; min-width:100%;';
+        slide.className = 'flex justify-center items-center flex-shrink-0 py-4';
+        slide.style.cssText = `scroll-snap-align:start; width:${slideW}px;`;
         slide.innerHTML = cardHTML(generatedCards[i]);
         track.appendChild(slide);
         totalSlides++;
@@ -276,8 +282,8 @@
 
       // スクロールでページカウンター同期
       track.onscroll = () => {
-        if (!track.clientWidth) return;
-        const idx = Math.round(track.scrollLeft / track.clientWidth);
+        if (!slideW) return;
+        const idx = Math.round(track.scrollLeft / slideW);
         if (idx !== currentSlide) {
           currentSlide = idx;
           document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
@@ -286,8 +292,6 @@
         }
       };
 
-      document.getElementById('emptyState').style.display = 'none';
-      document.getElementById('sliderSection').style.display = '';
       document.getElementById('sliderSection').scrollIntoView({ behavior: 'smooth' });
     }
 
