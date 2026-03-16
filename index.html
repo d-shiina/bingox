@@ -48,7 +48,7 @@
     /* MD3 Filled Button */
     .m3-btn {
       border: none; cursor: pointer;
-      border-radius: 100px;
+      border-radius: 8px;
       padding: 0 28px; height: 44px;
       font-family: 'Google Sans', 'Roboto', sans-serif;
       font-size: 14px; font-weight: 500;
@@ -100,7 +100,7 @@
   <main class="max-w-lg mx-auto px-4 py-6 flex flex-col gap-4">
 
     <!-- Settings card (MD3 Surface) -->
-    <div class="bg-white rounded-3xl p-6" style="box-shadow:0 1px 3px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.06);">
+    <div class="bg-white rounded-2xl p-6" style="box-shadow:0 1px 3px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.06);">
 
       <div class="grid grid-cols-2 gap-4 mb-4">
         <div class="m3-field">
@@ -143,7 +143,7 @@
   <!-- Slider -->
   <section id="sliderSection" class="pb-8" style="display:none">
     <div id="sliderTrack"
-      class="flex overflow-x-auto gap-4 px-4 pb-4"
+      class="flex overflow-x-auto pb-4"
       style="scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; scrollbar-width:none;">
     </div>
     <!-- Dot indicators -->
@@ -203,8 +203,6 @@
         return;
       }
 
-      const preview = document.getElementById('cardsPreview');
-      preview.innerHTML = '';
       generatedCards = [];
 
       for (let i = 0; i < count; i++) {
@@ -221,8 +219,8 @@
       const pages = [];
       for (let i = 0; i < generatedCards.length; i += 2) {
         const slide = document.createElement('div');
-        slide.className = 'bg-white rounded-3xl p-5 flex-shrink-0 flex flex-wrap gap-4 justify-center items-start';
-        slide.style.cssText = 'scroll-snap-align:start; width:calc(100vw - 32px); max-width:720px; box-shadow:0 1px 3px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.06);';
+        slide.className = 'flex flex-wrap gap-4 justify-center items-start';
+        slide.style.cssText = 'scroll-snap-align:start; flex-shrink:0; width:100vw; padding:0 16px; box-sizing:border-box;';
         slide.innerHTML = cardHTML(generatedCards[i]);
         if (generatedCards[i + 1]) slide.innerHTML += cardHTML(generatedCards[i + 1]);
         track.appendChild(slide);
