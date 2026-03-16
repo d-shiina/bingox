@@ -177,20 +177,27 @@
 
       .screen-only { display: none !important; }
 
+      @page {
+        size: A4 landscape;
+        /* margin が印刷余白を担う → page-wrapper はパディング不要 */
+        margin: 8mm 10mm;
+        /* 使用可能領域: (297-20)mm × (210-16)mm = 277mm × 194mm */
+      }
+
       /* Each page-wrapper = one A4 landscape page, 2 cards side by side */
       .page-wrapper {
         display: flex;
         flex-direction: row;
         flex-wrap: nowrap;
-        justify-content: center;
-        align-items: center;
-        width: 297mm;
-        min-height: 210mm;
-        padding: 8mm 10mm;
-        gap: 6mm;
+        align-items: stretch;   /* カードを高さいっぱいに伸ばす */
+        width: 277mm;           /* @page content 幅に合わせる */
+        height: 194mm;          /* @page content 高さに合わせる */
+        padding: 0;
+        gap: 5mm;
         border-radius: 0;
         box-shadow: none;
         margin: 0;
+        overflow: hidden;       /* はみ出しを確実にカット */
         page-break-after: always;
         break-after: page;
       }
@@ -199,34 +206,46 @@
         break-after: avoid;
       }
 
-      /* A4 landscape: 297mm wide, 2 cards → each ~135mm */
+      /* 2枚均等配置: (277mm - 5mm gap) / 2 = 136mm */
       .bingo-card {
-        width: 135mm;
+        flex: 0 0 136mm;
+        width: 136mm;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      /* ヘッダーは固定高さ */
+      .bingo-header {
         flex-shrink: 0;
       }
 
       .bingo-header-cell {
-        font-size: 24pt;
-        padding: 4mm 0;
+        font-size: 22pt;
+        padding: 3mm 0;
+      }
+
+      /* グリッドが残り高さを埋める */
+      .bingo-grid {
+        flex: 1;
+        min-height: 0;
+        grid-template-rows: repeat(5, 1fr);
       }
 
       .bingo-cell {
         aspect-ratio: unset;
-        height: 30mm;
-        font-size: 28pt;
+        height: auto;           /* grid rows が高さを決める */
+        font-size: 26pt;
       }
 
       .bingo-cell.free-cell {
-        font-size: 16pt;
+        font-size: 15pt;
       }
 
       .bingo-card-label {
+        flex-shrink: 0;
         font-size: 7pt;
-      }
-
-      @page {
-        size: A4 landscape;
-        margin: 0;
+        padding: 1mm 0;
       }
     }
   </style>
