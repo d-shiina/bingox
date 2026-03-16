@@ -390,19 +390,20 @@
         dataURLs.push(canvas.toDataURL('image/png'));
       }
 
-      const imgTags = dataURLs.map(url =>
-        `<img src="${url}" style="width:297mm;height:210mm;display:block;page-break-after:always;break-after:page;">`
+      const pageDivs = dataURLs.map((url, i) =>
+        `<div class="page"${i === dataURLs.length - 1 ? ' style="page-break-after:avoid;break-after:avoid;"' : ''}><img src="${url}"></div>`
       ).join('\n');
 
       const html = `<!DOCTYPE html>
 <html><head><meta charset="UTF-8"><style>
   @page { size: A4 landscape; margin: 0; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: white; }
-  img:last-child { page-break-after: avoid; break-after: avoid; }
+  html, body { width: 297mm; height: 210mm; overflow: hidden; background: white; }
+  .page { width: 297mm; height: 210mm; overflow: hidden; page-break-after: always; break-after: page; }
+  .page img { width: 100%; height: 100%; display: block; }
 </style></head>
 <body>
-${imgTags}
+${pageDivs}
 <script>window.onload = function(){ setTimeout(function(){ window.print(); }, 400); }<\/script>
 </body></html>`;
 
