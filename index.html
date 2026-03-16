@@ -273,8 +273,7 @@
     }
 
     // ===== Canvas → PDF =====
-    // PAD = GAP/2 にすることで切断後の内外余白を均等に
-    const PW = 1748, PH = 1240, PAD = 42, GAP = 84;
+    const PW = 1748, PH = 1240;
 
     function drawCard(ctx, cells, x, y, w, h) {
       const cellW = w / 5, cellH = cellW;
@@ -342,11 +341,16 @@
 
       // UIの再描画を待ってから重い処理を実行
       setTimeout(() => {
-        const cardW = Math.round((PW - PAD * 2 - GAP) / 2);
-      const cellW = cardW / 5;
-      const headerH = Math.round(cellW * 0.8);
-      const cardH = headerH + Math.round(cellW * 5);
-      const cardY = PAD + Math.round((PH - PAD * 2 - cardH) / 2);
+        // VPAD で上下余白を確保し、そこからカードサイズを逆算
+        // 切断バランス: HPAD = GAP/2
+        const VPAD = 200;
+        const cellW  = Math.floor((PH - 2 * VPAD) / 5.8); // 高さ制約からcellW
+        const cardW  = cellW * 5;
+        const headerH = Math.round(cellW * 0.8);
+        const cardH  = headerH + cellW * 5;
+        const HPAD   = Math.floor((PW / 2 - cardW) / 2);  // 切断後の内外余白を均等に
+        const GAP    = HPAD * 2;
+        const cardY  = VPAD + Math.round((PH - 2 * VPAD - cardH) / 2);
       const dataURLs = [];
 
       for (let i = 0; i < generatedCards.length; i += 2) {
@@ -355,10 +359,10 @@
         const ctx = canvas.getContext('2d');
         ctx.fillStyle = 'white';
         ctx.fillRect(0, 0, PW, PH);
-        drawCard(ctx, generatedCards[i], PAD, cardY, cardW, cardH);
+        drawCard(ctx, generatedCards[i], HPAD, cardY, cardW, cardH);
         if (generatedCards[i + 1]) {
-          drawCard(ctx, generatedCards[i + 1], PAD + cardW + GAP, cardY, cardW, cardH);
-          const cutX = Math.round(PAD + cardW + GAP / 2);
+          drawCard(ctx, generatedCards[i + 1], HPAD + cardW + GAP, cardY, cardW, cardH);
+          const cutX = Math.round(HPAD + cardW + GAP / 2);
           ctx.save();
           ctx.strokeStyle = '#444';
           ctx.lineWidth = 2;
